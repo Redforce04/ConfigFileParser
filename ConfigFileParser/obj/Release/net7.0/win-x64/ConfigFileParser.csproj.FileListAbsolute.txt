@@ -1,0 +1,17 @@
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\ConfigFileParser.exe
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\ConfigFileParser.deps.json
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\ConfigFileParser.runtimeconfig.json
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\ConfigFileParser.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\ConfigFileParser.pdb
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.csproj.AssemblyReference.cache
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.AssemblyInfoInputs.cache
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.AssemblyInfo.cs
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.csproj.CoreCompileInputs.cache
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\refint\ConfigFileParser.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.pdb
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.genruntimeconfig.cache
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ref\ConfigFileParser.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.csproj.Fody.CopyLocal.cache
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Release\net7.0\win-x64\ConfigFileParser.csproj.Fody.RuntimeCopyLocal.cache

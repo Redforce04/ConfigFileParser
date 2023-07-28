@@ -1,0 +1,5 @@
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\publish\ConfigFileParser.exe
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\publish\ConfigFileParser.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\publish\ConfigFileParser.runtimeconfig.json
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\publish\ConfigFileParser.pdb
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\publish\ConfigFileParser.deps.json
