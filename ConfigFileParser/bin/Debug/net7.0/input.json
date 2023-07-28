@@ -1,1 +1,330 @@
-{"Items":[{"Name":"Custom Damage Mods","ConfigName":"CustomDamageMods","InternalFieldName":"CustomDamageMods","Description":"What damage types should have custom multipliers?","DefaultValue":"Empty","Value":{"Trap":1.3},"Type":"Dictionary[DamageMethod, Single]"},{"Name":"Banned Hunter Weapon / Gadgets","ConfigName":"BannedHunterWeaponGadgets","InternalFieldName":"BannedHunterWeaponGadgets","Description":"What hunter weapons / gadgets should be banned from being used.","DefaultValue":"Empty","Value":[],"Type":"List[HunterGadget]"},{"Name":"Banned Hunter Perks","ConfigName":"BannedHunterPerks","InternalFieldName":"BannedHunterPerks","Description":"What hunter perks should be banned from being used.","DefaultValue":"Empty","Value":[],"Type":"List[HunterPerk]"},{"Name":"Banned Ghost Abilities","ConfigName":"BannedGhostAbilities","InternalFieldName":"BannedGhostAbilities","Description":"What ghost abilities should be banned from being used.","DefaultValue":"Empty","Value":[],"Type":"List[GhostAbility]"},{"Name":"Banned Ghost Haunts","ConfigName":"BannedGhostHaunts","InternalFieldName":"BannedGhostHaunts","Description":"What ghost haunts should be banned from being used.","DefaultValue":"Empty","Value":[],"Type":"List[GhostHaunt]"},{"Name":"Banned Ghost Perks","ConfigName":"BannedGhostPerks","InternalFieldName":"BannedGhostPerks","Description":"What ghost perks should be banned from being used.","DefaultValue":"Empty","Value":[],"Type":"List[GhostPerk]"},{"Name":"Force Choose Team","ConfigName":"Custom - ForceChooseTeam","InternalFieldName":"ForceChooseTeam","Description":"Will players be forced to choose a team?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Pre Match Time","ConfigName":"Custom - PreMatchTime","InternalFieldName":"PreMatchTime","Description":"How many seconds will the pre-round last.","DefaultValue":"90","Value":90,"Type":"Int32"},{"Name":"Midnight Time","ConfigName":"Custom - MidnightTime","InternalFieldName":"MidnightTime","Description":"How many seconds before midnight hits.","DefaultValue":"240","Value":240,"Type":"Int32"},{"Name":"Post Midnight Time","ConfigName":"Custom - PostMidnightTime","InternalFieldName":"PostMidnightTime","Description":"How many seconds hunters must survive after midnight to escape.","DefaultValue":"180","Value":180,"Type":"Int32"},{"Name":"Ghosts Revive After Midnight","ConfigName":"Custom - GhostsReviveAfterMidnight","InternalFieldName":"GhostsReviveAfterMidnight","Description":"Should dead ghosts be revived at midnight?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Ghost Ability Cooldown Multiplier","ConfigName":"Custom - Ghost Ability Cooldown Multiplier","InternalFieldName":"GhostAbilityCooldownMultiplier","Description":"What should the cooldown multiplier be for ghost abilities?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Ghost Movement Speed Multiplier","ConfigName":"Custom - Ghost Movement Speed Multiplier","InternalFieldName":"GhostMovementSpeedMultiplier","Description":"What should the speed multiplier be for ghosts?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Hunter Movement Speed Multiplier","ConfigName":"Custom - Hunter Movement Speed Multiplier","InternalFieldName":"HunterMovementSpeedMultiplier","Description":"What should the speed multiplier be for ghosts?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Limited UI Mode","ConfigName":"Custom - Limited UI Mode","InternalFieldName":"LimitedUIMode","Description":"Should limited UI Mode be enabled?","DefaultValue":"False","Value":false,"Type":"Boolean"},{"Name":"Revives Disabled","ConfigName":"Custom - Revives Disabled","InternalFieldName":"RevivesDisabled","Description":"Should revives be disabled?","DefaultValue":"False","Value":false,"Type":"Boolean"},{"Name":"Hunter - Use Max Player Count","ConfigName":"Custom - Hunter - Use Max Player Count","InternalFieldName":"HunterUseMaxPlayerCount","Description":"Should the max player count apply to hunters?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Ghost - Use Max Player Count","ConfigName":"Custom - Ghost - Use Max Player Count","InternalFieldName":"GhostUseMaxPlayerCount","Description":"Should the max player count apply to ghosts?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Hunter - Max Player Count","ConfigName":"Custom - Hunter - Max Player Count","InternalFieldName":"HunterMaxPlayerCount","Description":"What should the max player count be for hunters?","DefaultValue":"4","Value":4,"Type":"Int32"},{"Name":"Ghost - Max Player Count","ConfigName":"Custom - Ghost - Max Player Count","InternalFieldName":"GhostMaxPlayerCount","Description":"What should the max player count be for ghosts?","DefaultValue":"4","Value":4,"Type":"Int32"},{"Name":"All Loadout Unlocked","ConfigName":"Custom - All Loadout Unlocked","InternalFieldName":"AllLoadoutUnlocked","Description":"Should all loadouts be unlocked?","DefaultValue":"False","Value":false,"Type":"Boolean"},{"Name":"Mystery Loadout","ConfigName":"Custom - Mystery Loadout","InternalFieldName":"MysteryLoadout","Description":"Should a mystery loadout be equipped for players automatically?","DefaultValue":"False","Value":false,"Type":"Boolean"},{"Name":"Ghost Slingshot Multiplier","ConfigName":"Custom - Ghost Slingshot Multiplier","InternalFieldName":"GhostSlingshotMultiplier","Description":"What should the multiplier be for the ghost slingshot attack?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Allow Ghost Respawns","ConfigName":"Custom - Allow Ghost Respawns","InternalFieldName":"AllowGhostRespawns","Description":"Should ghosts be able to respawn?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Ghost - Max Respawn Count","ConfigName":"Custom - Ghost - Max Respawn Count","InternalFieldName":"GhostMaxRespawnCount","Description":"How many total respawns should the ghost team have?","DefaultValue":"100","Value":100,"Type":"Int32"},{"Name":"Allow Hunter Respawns","ConfigName":"Custom - Allow Hunter Respawns","InternalFieldName":"AllowHunterRespawns","Description":"Should hunters be able to respawn?","DefaultValue":"True","Value":true,"Type":"Boolean"},{"Name":"Hunter - Max Respawn Count","ConfigName":"Custom - Hunter - Max Respawn Count","InternalFieldName":"HunterMaxRespawnCount","Description":"How many total respawns should the hunter team have?","DefaultValue":"100","Value":10,"Type":"Int32"},{"Name":"Disable Life Reserve System","ConfigName":"Custom - Disable Life Reserve System?","InternalFieldName":"DisableLifeReserveSystem","Description":"Should players that join mid-match replace bots that are alive?","DefaultValue":"True","Value":false,"Type":"Boolean"},{"Name":"Hunter Health Modifier","ConfigName":"Custom - Hunter Health Modifier","InternalFieldName":"HunterHealthModifier","Description":"What should the health multiplier be for hunters?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Ghost Health Modifier","ConfigName":"Custom - Ghost Health Modifier","InternalFieldName":"GhostHealthModifier","Description":"What should the health multiplier be for ghosts?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Ecto Build Up Speed Multiplier","ConfigName":"Custom - Ecto Build Up Speed Multiplier","InternalFieldName":"EctoBuildUpSpeedMultiplier","Description":"What should the speed multiplier be for ectoplasm buildup?","DefaultValue":"1","Value":1.0,"Type":"Single"},{"Name":"Unpossessed Prop Health Multiplier","ConfigName":"Custom - Unpossessed Prop Health Multiplier","InternalFieldName":"UnpossessedPropHealthMultiplier","Description":"What should the health multiplier be for props that are not currently possessed?","DefaultValue":"1.5","Value":1.3,"Type":"Single"},{"Name":"Hunter Gadget Count Multiplier","ConfigName":"Custom - Hunter Gadget Count Multiplier","InternalFieldName":"HunterGadgetCountMultiplier","Description":"What should the gadget count multiplier be for hunters?","DefaultValue":"0","Value":0.0,"Type":"Single"},{"Name":"Self Damage When Hit Level-Prop","ConfigName":"Custom - Self Damage When Hit Lvlprop?","InternalFieldName":"SelfDamageWhenHitLvlprop","Description":"Should hunters take damage when they hit an un-possessed prop?","DefaultValue":"False","Value":false,"Type":"Boolean"},{"Name":"Hunter - Self Damage Level-Prop Amount","ConfigName":"Custom - Hunter - Self Damage Lvlprop Amount","InternalFieldName":"HunterSelfDamageLvlpropAmount","Description":"How much damage will hunters take if they hit an un-possessed prop.","DefaultValue":"0","Value":0,"Type":"Int32"},{"Name":"AdminPUIDs","ConfigName":"AdminPUIDs","InternalFieldName":"AdminPUIDs","Description":"What players should be able to access the admin menu.","DefaultValue":"Empty","Value":[],"Type":"List[String]"}]}
+{
+    "Items": [
+        {
+            "Name": "Custom Damage Mods",
+            "ConfigName": "CustomDamageMods",
+            "InternalFieldName": "CustomDamageMods",
+            "Description": "What damage types should have custom multipliers?",
+            "DefaultValue": "Empty",
+            "Value": {
+                "Trap": 1.3
+            },
+            "Type": "Dictionary[DamageMethod, Single]"
+        },
+        {
+            "Name": "Banned Thingamabobs",
+            "ConfigName": "BannedThingamabobs",
+            "InternalFieldName": "BannedThingamabobs",
+            "Description": "What thingamabobs should be banned from being used.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[Thingamabobs]"
+        },
+        {
+            "Name": "Banned Hunter Perks",
+            "ConfigName": "BannedHunterPerks",
+            "InternalFieldName": "BannedHunterPerks",
+            "Description": "What hunter perks should be banned from being used.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[HunterPerk]"
+        },
+        {
+            "Name": "Banned Ghost Abilities",
+            "ConfigName": "BannedGhostAbilities",
+            "InternalFieldName": "BannedGhostAbilities",
+            "Description": "What ghost abilities should be banned from being used.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[GhostAbility]"
+        },
+        {
+            "Name": "Banned Ghost Haunts",
+            "ConfigName": "BannedGhostHaunts",
+            "InternalFieldName": "BannedGhostHaunts",
+            "Description": "What ghost haunts should be banned from being used.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[GhostHaunt]"
+        },
+        {
+            "Name": "Banned Ghost Perks",
+            "ConfigName": "BannedGhostPerks",
+            "InternalFieldName": "BannedGhostPerks",
+            "Description": "What ghost perks should be banned from being used.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[GhostPerk]"
+        },
+        {
+            "Name": "Force Choose Team",
+            "ConfigName": "Custom - ForceChooseTeam",
+            "InternalFieldName": "ForceChooseTeam",
+            "Description": "Will players be forced to choose a team?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Pre Match Time",
+            "ConfigName": "Custom - PreMatchTime",
+            "InternalFieldName": "PreMatchTime",
+            "Description": "How many seconds will the pre-round last.",
+            "DefaultValue": "90",
+            "Value": 90,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Midnight Time",
+            "ConfigName": "Custom - MidnightTime",
+            "InternalFieldName": "MidnightTime",
+            "Description": "How many seconds before midnight hits.",
+            "DefaultValue": "240",
+            "Value": 240,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Post Midnight Time",
+            "ConfigName": "Custom - PostMidnightTime",
+            "InternalFieldName": "PostMidnightTime",
+            "Description": "How many seconds hunters must survive after midnight to escape.",
+            "DefaultValue": "180",
+            "Value": 180,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Ghosts Revive After Midnight",
+            "ConfigName": "Custom - GhostsReviveAfterMidnight",
+            "InternalFieldName": "GhostsReviveAfterMidnight",
+            "Description": "Should dead ghosts be revived at midnight?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Ghost Ability Cooldown Multiplier",
+            "ConfigName": "Custom - Ghost Ability Cooldown Multiplier",
+            "InternalFieldName": "GhostAbilityCooldownMultiplier",
+            "Description": "What should the cooldown multiplier be for ghost abilities?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Ghost Movement Speed Multiplier",
+            "ConfigName": "Custom - Ghost Movement Speed Multiplier",
+            "InternalFieldName": "GhostMovementSpeedMultiplier",
+            "Description": "What should the speed multiplier be for ghosts?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Hunter Movement Speed Multiplier",
+            "ConfigName": "Custom - Hunter Movement Speed Multiplier",
+            "InternalFieldName": "HunterMovementSpeedMultiplier",
+            "Description": "What should the speed multiplier be for ghosts?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Limited UI Mode",
+            "ConfigName": "Custom - Limited UI Mode",
+            "InternalFieldName": "LimitedUIMode",
+            "Description": "Should limited UI Mode be enabled?",
+            "DefaultValue": "False",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Revives Disabled",
+            "ConfigName": "Custom - Revives Disabled",
+            "InternalFieldName": "RevivesDisabled",
+            "Description": "Should revives be disabled?",
+            "DefaultValue": "False",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Hunter - Use Max Player Count",
+            "ConfigName": "Custom - Hunter - Use Max Player Count",
+            "InternalFieldName": "HunterUseMaxPlayerCount",
+            "Description": "Should the max player count apply to hunters?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Ghost - Use Max Player Count",
+            "ConfigName": "Custom - Ghost - Use Max Player Count",
+            "InternalFieldName": "GhostUseMaxPlayerCount",
+            "Description": "Should the max player count apply to ghosts?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Hunter - Max Player Count",
+            "ConfigName": "Custom - Hunter - Max Player Count",
+            "InternalFieldName": "HunterMaxPlayerCount",
+            "Description": "What should the max player count be for hunters?",
+            "DefaultValue": "4",
+            "Value": 4,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Ghost - Max Player Count",
+            "ConfigName": "Custom - Ghost - Max Player Count",
+            "InternalFieldName": "GhostMaxPlayerCount",
+            "Description": "What should the max player count be for ghosts?",
+            "DefaultValue": "4",
+            "Value": 4,
+            "Type": "Int32"
+        },
+        {
+            "Name": "All Loadout Unlocked",
+            "ConfigName": "Custom - All Loadout Unlocked",
+            "InternalFieldName": "AllLoadoutUnlocked",
+            "Description": "Should all loadouts be unlocked?",
+            "DefaultValue": "False",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Mystery Loadout",
+            "ConfigName": "Custom - Mystery Loadout",
+            "InternalFieldName": "MysteryLoadout",
+            "Description": "Should a mystery loadout be equipped for players automatically?",
+            "DefaultValue": "False",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Ghost Slingshot Multiplier",
+            "ConfigName": "Custom - Ghost Slingshot Multiplier",
+            "InternalFieldName": "GhostSlingshotMultiplier",
+            "Description": "What should the multiplier be for the ghost slingshot attack?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Allow Ghost Respawns",
+            "ConfigName": "Custom - Allow Ghost Respawns",
+            "InternalFieldName": "AllowGhostRespawns",
+            "Description": "Should ghosts be able to respawn?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Ghost - Max Respawn Count",
+            "ConfigName": "Custom - Ghost - Max Respawn Count",
+            "InternalFieldName": "GhostMaxRespawnCount",
+            "Description": "How many total respawns should the ghost team have?",
+            "DefaultValue": "100",
+            "Value": 100,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Allow Hunter Respawns",
+            "ConfigName": "Custom - Allow Hunter Respawns",
+            "InternalFieldName": "AllowHunterRespawns",
+            "Description": "Should hunters be able to respawn?",
+            "DefaultValue": "True",
+            "Value": true,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Hunter - Max Respawn Count",
+            "ConfigName": "Custom - Hunter - Max Respawn Count",
+            "InternalFieldName": "HunterMaxRespawnCount",
+            "Description": "How many total respawns should the hunter team have?",
+            "DefaultValue": "100",
+            "Value": 10,
+            "Type": "Int32"
+        },
+        {
+            "Name": "Disable Life Reserve System",
+            "ConfigName": "Custom - Disable Life Reserve System?",
+            "InternalFieldName": "DisableLifeReserveSystem",
+            "Description": "Should players that join mid-match replace bots that are alive?",
+            "DefaultValue": "True",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Hunter Health Modifier",
+            "ConfigName": "Custom - Hunter Health Modifier",
+            "InternalFieldName": "HunterHealthModifier",
+            "Description": "What should the health multiplier be for hunters?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Ghost Health Modifier",
+            "ConfigName": "Custom - Ghost Health Modifier",
+            "InternalFieldName": "GhostHealthModifier",
+            "Description": "What should the health multiplier be for ghosts?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Ecto Build Up Speed Multiplier",
+            "ConfigName": "Custom - Ecto Build Up Speed Multiplier",
+            "InternalFieldName": "EctoBuildUpSpeedMultiplier",
+            "Description": "What should the speed multiplier be for ectoplasm buildup?",
+            "DefaultValue": "1",
+            "Value": 1.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Unpossessed Prop Health Multiplier",
+            "ConfigName": "Custom - Unpossessed Prop Health Multiplier",
+            "InternalFieldName": "UnpossessedPropHealthMultiplier",
+            "Description": "What should the health multiplier be for props that are not currently possessed?",
+            "DefaultValue": "1.5",
+            "Value": 1.3,
+            "Type": "Single"
+        },
+        {
+            "Name": "Hunter Gadget Count Multiplier",
+            "ConfigName": "Custom - Hunter Gadget Count Multiplier",
+            "InternalFieldName": "HunterGadgetCountMultiplier",
+            "Description": "What should the gadget count multiplier be for hunters?",
+            "DefaultValue": "0",
+            "Value": 0.0,
+            "Type": "Single"
+        },
+        {
+            "Name": "Self Damage When Hit Level-Prop",
+            "ConfigName": "Custom - Self Damage When Hit Lvlprop?",
+            "InternalFieldName": "SelfDamageWhenHitLvlprop",
+            "Description": "Should hunters take damage when they hit an un-possessed prop?",
+            "DefaultValue": "False",
+            "Value": false,
+            "Type": "Boolean"
+        },
+        {
+            "Name": "Hunter - Self Damage Level-Prop Amount",
+            "ConfigName": "Custom - Hunter - Self Damage Lvlprop Amount",
+            "InternalFieldName": "HunterSelfDamageLvlpropAmount",
+            "Description": "How much damage will hunters take if they hit an un-possessed prop.",
+            "DefaultValue": "0",
+            "Value": 0,
+            "Type": "Int32"
+        },
+        {
+            "Name": "AdminPUIDs",
+            "ConfigName": "AdminPUIDs",
+            "InternalFieldName": "AdminPUIDs",
+            "Description": "What players should be able to access the admin menu.",
+            "DefaultValue": "Empty",
+            "Value": [],
+            "Type": "List[String]"
+        }
+    ]
+}

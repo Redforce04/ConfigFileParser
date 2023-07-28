@@ -312,17 +312,41 @@ public class ConfigParser
             }
         }
 
-        string info = "";
-        if (NewFields.Count > 1)
+        string info =
+            $"<Warn>" +
+            $"{(NewFields.Count > 0 ? $"{NewFields.Count} new config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been added" : "")} " +
+            $"{(NewFields.Count > 0 && OldFields.Count > 0 ? "and" : "to")}" +
+            $" {(OldFields.Count > 0 ? $"{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from " : "")}" +
+            $" MGH since you last configured mgh with this tool.\n";
+        
+        if (NewFields.Count > 0)
         {
-            info += $"<Warn>{NewFields.Count} new config options have been added to MGH since you last configured mgh with this tool.\n";
+            string newConfs = "";
+            foreach (string newConf in NewFields)
+            {
+                newConfs += $"<DarkGreen>+{newConf}<Secondary>, ";
+            }
+            //info += $"<Warn>{NewFields.Count} new config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been added to MGH since you last configured mgh with this tool.\n";
+            info += $"<Primary>New Configs: <Secondary>[{newConfs},<Secondary>]\n".Replace(", ,", "");
         }
 
-        if (OldFields.Count > 1)
+        if (OldFields.Count > 0)
         {
-            info += $"<Warn>{OldFields.Count} config options have been removed from MGH since you last configured mgh with this tool.\n";
+            string oldConfs = "";
+            foreach (string oldConf in OldFields)
+            {
+                oldConfs += $"<DarkRed>-{oldConf}<Secondary>, ";
+            }
+            //info += $"<Warn>{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from MGH since you last configured mgh with this tool.\n";
+            info += $"<Primary>Old Configs: <Secondary>[{oldConfs},<Secondary>]\n".Replace(", ,", "");
+
         }
 
+        
+        foreach (string oldConf in OldFields)
+        {
+            
+        }
         if (OldFields.Count == 0 && NewFields.Count == 0)
         {
             CustomTextParser.Singleton.PrintLine("<Primary>All configs up to date.");
@@ -332,7 +356,7 @@ public class ConfigParser
         {
             
             //info += $"<Primary>Would you like to {(OldFields.Count == 0 ? "" : $"remove old configs {(NewFields.Count == 0 ? "" : "and ")}")}{(OldFields.Count == 0 ? "" : "configure new configs")}? (Yes / No)";
-            info += "<Primary>Would you like to reconfigure server configs, and overwrite old configs?";
+            info += "<Primary>Would you like to reconfigure server configs, and overwrite old configs? (Yes / No)";
             CustomTextParser.Singleton.PrintLine(info);
             string? lineread = Console.ReadLine();
             if (lineread is null || lineread == "" || lineread.ToLower() == "no" || lineread.ToLower() == "n")
