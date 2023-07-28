@@ -51,8 +51,8 @@ As mentioned prior, MGH BetterConfigs creates a separate config.json file that p
             "Description": "What hunter weapons / gadgets should be banned from being used.",
             "DefaultValue": "Empty",
             "Value": [
-              C4,
-              Trap
+              "C4",
+              "Trap""
             ], // Normal json parsing.
             "Type": "List[HunterGadget]"
         },
