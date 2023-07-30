@@ -10,6 +10,7 @@ Config conf = new Config();
 
 Config.Singleton.Debug = args.Any(x => x == "--debug");
 var unused4 = new CustomTextParser();
+
 CustomTextParser.Singleton.PrintLine("Starting MGH BetterConfigs.");
 Thread.Sleep(2000);
 var unused = new ArgumentParser(args);
@@ -21,6 +22,7 @@ if (!ArgumentParser.Singleton.ParsedSuccessfully)
 }
 
 if(conf.Debug) Console.WriteLine($"Input Parser: {conf.InputParserType}, Output Parser: {conf.OutputParserType}");
+var unused5 = new ConfigUpdater();
 var unused2 = new FileManager();
 var unused3 = new ConfigParser();
 if (FileManager.RunInitializerScript)

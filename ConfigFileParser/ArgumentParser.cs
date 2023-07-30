@@ -139,13 +139,20 @@ namespace ConfigFileParser
 
                 // if (conf.Debug) Console.WriteLine($"Argument: {argument}");
                 
-                    switch (argument)
+                    switch (argument.ToLower())
                     {
                         case "--debug":
                             break;
                         case "-r" or "--force-reconfigure":
                             FileManager.RunInitializerScript = true;
                             break;
+                        case "--no-auto-updater":
+                            Config.Singleton.AutoUpdate = false;
+                            break;
+                        case "-c" or "--use-cached-config":
+                            Config.Singleton.UseCache = false;
+                            break;
+                        
                         case "-q" or "--quiet":
                             Config.Singleton.Silent = true;
                             break;

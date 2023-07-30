@@ -133,7 +133,7 @@ public class JsonParserAttribute : CustomParserAttribute
                 {
                     Console.WriteLine("Last action skipping warning.");
                 }
-                info.ErrorString += $"<Warn>Could not parse \'{lastEntry}\'. Please re-enter the command / value. <Secondary>[Try <Warn>{failedTries} <Secondary>/ 3]";
+                info.ErrorString += $"<Warn>Could not process the last entry. Skipping in {3 - failedTries} more failed {(failedTries > 1 ? "try" : "tries")}. [Try <Warn>{failedTries} <Secondary>/ 3]\n";
             }
             else
             {
@@ -153,7 +153,7 @@ public class JsonParserAttribute : CustomParserAttribute
                 }
                 else
                 {
-                    info.ErrorString += $"<Warn>Type <White>'finish'<Warn> or <White>'skip'<Warn> when done. Blank entries only skip on the first input.";
+                    info.ErrorString += $"<Warn>Type <White>'finish'<Warn> or <White>'skip'<Warn> when done. Blank entries only skip on the first input.\n";
                 }
             }
             if (firstTry)
@@ -209,7 +209,7 @@ public class JsonParserAttribute : CustomParserAttribute
                         else
                         {
                             failedTries++;
-                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the dictionary.";
+                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the dictionary.\n";
                             continue;
                         }
                     }
@@ -222,7 +222,7 @@ public class JsonParserAttribute : CustomParserAttribute
                         else
                         {
                             failedTries++;
-                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the list.";
+                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the list.\n";
                             continue;
                         }
                     }
@@ -260,14 +260,24 @@ public class JsonParserAttribute : CustomParserAttribute
                     if (arg2 is not null)
                     {
                         arg2Value = ProcessArg(arg2, type.GenericTypeArguments[1]);
+                        if (arg2Value is null)
+                        {
+                            showInvalidWarning = true;
+                            char starter = type.GenericTypeArguments[1].Name[0];
+                            info.ErrorString += $"<Warn>Could not parse value <White>'{arg2}'<Warn>. Ensure it is a{(starter is 'a' or 'e' or 'i' or 'o' or 'u' ? "n" : "" )} {type.GenericTypeArguments[1]}.\n";
+                            failedTries++;
+                            continue;
+                        }
                     }
-
                     if (arg1Value is null || (isDict && arg2Value is null))
                     {
                         showInvalidWarning = true;
+                        char starter = type.GenericTypeArguments[0].Name[0];
+                        info.ErrorString += $"<Warn>Could not parse key <White>'{itemToAdd}'<Warn>. Ensure it is a{(starter is 'a' or 'e' or 'i' or 'o' or 'u' ? "n" : "" )} {type.GenericTypeArguments[0]}.\n";
                         failedTries++;
                         continue;
                     }
+
 
                     if (isDict)
                     {
@@ -315,27 +325,18 @@ public class JsonParserAttribute : CustomParserAttribute
 
     public object? ProcessArg(string arg, Type type)
     {
-        
-        if (type.IsEnum)
-        {
-            try
-            {
-                return Enum.Parse(type, arg);
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            
-        }
-
-        if (type.GetInterface(nameof(IConvertible)) is not null)
-        {
-            return Convert.ChangeType(arg, type);
-        }
-
         try
         {
+            if (type.IsEnum)
+            {
+                return Enum.Parse(type, arg, true);
+            }
+
+            if (type.GetInterface(nameof(IConvertible)) is not null)
+            {
+                return Convert.ChangeType(arg, type);
+            }
+
             return Newtonsoft.Json.JsonConvert.DeserializeObject(arg, type);
         }
         catch (Exception e)
@@ -347,8 +348,8 @@ public class JsonParserAttribute : CustomParserAttribute
         }
 
         return null;
-
     }
+
     /*
     public object? Parse2(out bool skip, ref TextInfo info, Type type)
     {

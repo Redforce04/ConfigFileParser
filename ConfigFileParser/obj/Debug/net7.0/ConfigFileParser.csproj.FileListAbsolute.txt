@@ -4,8 +4,6 @@ C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\C
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.AssemblyInfo.cs
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.csproj.CoreCompileInputs.cache
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.genruntimeconfig.cache
-C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.csproj.Fody.CopyLocal.cache
-C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.csproj.Fody.RuntimeCopyLocal.cache
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\MGHBetterConfigs.exe
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\MGHBetterConfigs.deps.json
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\MGHBetterConfigs.runtimeconfig.json
@@ -15,3 +13,5 @@ C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\M
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\refint\MGHBetterConfigs.dll
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\MGHBetterConfigs.pdb
 C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ref\MGHBetterConfigs.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\obj\Debug\net7.0\ConfigFileParser.csproj.CopyComplete

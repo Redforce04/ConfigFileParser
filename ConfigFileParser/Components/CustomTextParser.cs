@@ -31,8 +31,12 @@ public class CustomTextParser
     public void PrintLine(string line)
     {
         Console.Clear();
-        Print(Billboard);
-        Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length)/2) + "\n");
+        if (!Config.Singleton.Silent)
+        {
+            Print(Billboard);
+            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
+        }
+
         Print(line);
     }
     public void PrintCustomInput(TextInfo info)
@@ -41,8 +45,12 @@ public class CustomTextParser
         // 88 - text.count /2
 
         Console.Clear();
-        Print(Billboard);
-        Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length)/2) + "\n");
+        if (!Config.Singleton.Silent)
+        {
+            Print(Billboard);
+            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
+        }
+
         Print($"<Primary>Current Config: <Accent>{info.ConfigName} <Primary>({info.ConfigType}) - Config [<Accent>{info.CurrentConfigNum} <Primary>/ {info.TotalConfigNum}]");
         Print($"<Primary>{info.Description} (default: <Accent>{info.DefaultValue}<Primary>)");
 
@@ -67,8 +75,12 @@ public class CustomTextParser
     public void PrintConfigSummary(TextInfo info)
     {
         Console.Clear();
-        Print(Billboard);
-        Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length)/2) + "\n");
+        if (!Config.Singleton.Silent)
+        {
+            Print(Billboard);
+            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
+        }
+
         Print($"{info.Description}");
         /*foreach (string instructionLine in info.Instruction.Split('\n'))
         {

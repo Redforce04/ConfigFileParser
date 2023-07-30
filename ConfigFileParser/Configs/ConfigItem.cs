@@ -20,12 +20,13 @@ public class ConfigItem
     public string ConfigName { get; set; }
     public string InternalFieldName { get; set; }
     public string Description { get; set; }
-    public object DefaultValue { get; set; }
+    public object?DefaultValue { get; set; }
     public object? Value { get; set; }
     public string Type { get; set; }
 }
 
 public class SerializableConfig
 {
+    public static SerializableConfig Latest;
     public List<ConfigItem> Items = new List<ConfigItem>();
 }

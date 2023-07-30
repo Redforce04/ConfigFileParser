@@ -262,80 +262,52 @@ public class ConfigParser
             return;
         }
 
-        MGHConfig conf = new MGHConfig();
-        var fields = conf.GetType().GetFields();
-        List<string> ImplementedFields = new List<string>();
-        List<string> OldFields = new List<string>();
-        List<string> NewFields = new List<string>();
+        // Download latest Config
+        // Cached Config is MGH
+        // 
+        MGHConfig conf = (MGHConfig) ConvertSerializableConfigToOtherConfig(config, new MGHConfig(), out List<ConfigItem> oldConfigs, out List<ConfigItem> newConfigs, out List<ConfigItem> changedConfigs, true);
 
-        foreach (var confItem in config.Items)
-        {
-            ImplementedFields.Add(confItem.InternalFieldName);
-            var field = fields.FirstOrDefault(x => x.Name == confItem.InternalFieldName);
-
-            if (field is null)
-            {
-                OldFields.Add(confItem.InternalFieldName);
-                continue;
-            }
-
-
-            object? newValue = null;
-            if (confItem.Value is JContainer)
-            {
-                newValue = ((JContainer)confItem.Value).ToObject(field.FieldType);
-            }
-            else
-            {
-                newValue = Convert.ChangeType(confItem.Value, field.FieldType);
-            }
-            
-            
-            try
-            {
-                field.SetValue(conf, newValue);
-            }
-            catch (Exception e)
-            {
-                if (Config.Singleton.Debug)
-                {
-                    Console.WriteLine($"{e}");
-                }
-            }
-        }
-
-        foreach (FieldInfo field in fields)
-        {
-            if (!ImplementedFields.Contains(field.Name))
-            {
-                NewFields.Add(field.Name);
-            }
-        }
-
-        string info =
-            $"<Warn>" +
-            $"{(NewFields.Count > 0 ? $"{NewFields.Count} new config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been added" : "")} " +
-            $"{(NewFields.Count > 0 && OldFields.Count > 0 ? "and" : "to")}" +
-            $" {(OldFields.Count > 0 ? $"{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from " : "")}" +
-            $" MGH since you last configured mgh with this tool.\n";
+        bool oldConfigsChanged = oldConfigs.Count > 0;
+        bool newConfigsChanged = newConfigs.Count > 0;
+        bool configsChanged = changedConfigs.Count > 0;
         
-        if (NewFields.Count > 0)
+        string info = $"<Warn>Since you last configured mgh with this tool:";
+        // "X new config option[s] (have / has) been added."
+        if (oldConfigsChanged) 
+        {
+            info +=
+                $"{(newConfigs.Count > 0 ? $"{newConfigs.Count} new config option{(newConfigs.Count == 1 ? "" : "s")} {(newConfigs.Count == 1 ? "has" : "have")} been added." : "")} ";
+        }
+        // "X config option[s] (have/has) been removed."
+        if (newConfigsChanged)
+        {
+            // info += $"{(newConfigs.Count > 0 && oldConfigs.Count > 0 ? "and" : "to")}";
+            info +=$"{(oldConfigs.Count > 0 ? $"{oldConfigs.Count} config option{(oldConfigs.Count == 1 ? "" : "s")} {(oldConfigs.Count == 1 ? "has" : "have")} been removed." : "")} ";
+        }
+        // X config option[s] (have/has) been changed.
+        if (configsChanged)
+        {
+            info += $"{(changedConfigs.Count > 0 ? $"{changedConfigs.Count} config option{(changedConfigs.Count == 1 ? "" : "s")} {(changedConfigs.Count == 1 ? "has" : "have")} been changed." : "")} ";
+        }
+
+        info += $"\nA download may be necessary in order to properly utilize the latest config.\n";
+        if (newConfigs.Count > 0)
         {
             string newConfs = "";
-            foreach (string newConf in NewFields)
+            foreach (ConfigItem newConf in newConfigs)
             {
-                newConfs += $"<DarkGreen>+{newConf}<Secondary>, ";
+                newConfs += $"<DarkGreen>+{newConf.Name}<Secondary>, ";
             }
             //info += $"<Warn>{NewFields.Count} new config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been added to MGH since you last configured mgh with this tool.\n";
             info += $"<Primary>New Configs: <Secondary>[{newConfs},<Secondary>]\n".Replace(", ,", "");
         }
 
-        if (OldFields.Count > 0)
+        if (oldConfigs.Count > 0)
         {
             string oldConfs = "";
-            foreach (string oldConf in OldFields)
+            foreach (ConfigItem oldConf in oldConfigs)
             {
-                oldConfs += $"<DarkRed>-{oldConf}<Secondary>, ";
+                oldConfs += $"<DarkRed>-{oldConf.Name}<Secondary>, ";
             }
             //info += $"<Warn>{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from MGH since you last configured mgh with this tool.\n";
             info += $"<Primary>Old Configs: <Secondary>[{oldConfs},<Secondary>]\n".Replace(", ,", "");
@@ -343,11 +315,8 @@ public class ConfigParser
         }
 
         
-        foreach (string oldConf in OldFields)
-        {
-            
-        }
-        if (OldFields.Count == 0 && NewFields.Count == 0)
+        
+        if (oldConfigs.Count == 0 && newConfigs.Count == 0)
         {
             CustomTextParser.Singleton.PrintLine("<Primary>All configs up to date.");
             Thread.Sleep(2000);
@@ -398,6 +367,166 @@ public class ConfigParser
                 CustomTextParser.Singleton.PrintLine($"<Warn>This output parser is not implemented.");
                 break;
         }
+    }
+
+    internal object ConvertSerializableConfigToOtherConfig(SerializableConfig conf, object referenceConfig, out List<ConfigItem> oldConfigs, out List<ConfigItem> newConfigs, out List<ConfigItem> changedConfigs, bool compareToLatest = true)
+    {
+        object obj = referenceConfig;
+        List<ConfigItem> implementedFields = new List<ConfigItem>();
+        oldConfigs = new List<ConfigItem>();
+        newConfigs = new List<ConfigItem>();
+        changedConfigs = new List<ConfigItem>();
+        
+        var fields = referenceConfig.GetType().GetFields();
+        foreach (ConfigItem confItem in conf.Items)
+        {
+            implementedFields.Add(confItem);
+
+            var field = fields.FirstOrDefault(x => x.Name == confItem.InternalFieldName);
+            if (compareToLatest)
+            {
+                ConfigItem? item =
+                    SerializableConfig.Latest.Items.FirstOrDefault(x => x.InternalFieldName == confItem.InternalFieldName);
+                if (item is null)
+                {
+                    oldConfigs.Add(confItem);
+                }
+                else
+                {
+                    // check for changed configs
+                    if (item.Type != confItem.Type || item.Name != confItem.Name || item.ConfigName != confItem.ConfigName)
+                    {
+                        changedConfigs.Add(confItem);
+                    }
+                }
+            }
+            if (field is null) 
+            {
+                oldConfigs.Add(confItem);
+                continue;
+            }
+            
+
+
+            object? newValue = null;
+            if (confItem.Value is JContainer)
+            {
+                newValue = ((JContainer)confItem.Value).ToObject(field.FieldType);
+            }
+            else
+            {
+                newValue = Convert.ChangeType(confItem.Value, field.FieldType);
+            }
+            
+            
+            try
+            {
+                field.SetValue(obj, newValue);
+            }
+            catch (Exception e)
+            {
+                if (Config.Singleton.Debug)
+                {
+                    Console.WriteLine($"{e}");
+                }
+            }
+        }
+
+
+        object? defaultFieldValue = null;
+        try
+        {
+            defaultFieldValue = referenceConfig.GetType().GetConstructor(Type.EmptyTypes)?.Invoke(new object[]{});
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        if (compareToLatest)
+        {
+            foreach (ConfigItem item in SerializableConfig.Latest.Items)
+            {
+                ConfigItem? oldConfigField =
+                    implementedFields.FirstOrDefault(x => x.InternalFieldName == item.InternalFieldName);
+                if (oldConfigField == null)
+                {
+                    newConfigs.Add(item);
+                }
+                else
+                {
+                    // check for changed configs
+                    if (item.Type != oldConfigField.Type || item.Name != oldConfigField.Name || item.ConfigName != oldConfigField.ConfigName)
+                    {
+                        changedConfigs.Add(item);
+                    }
+                }
+            }
+        }
+        else
+        {
+
+            foreach (FieldInfo field in fields)
+            {
+                if (!implementedFields.Any(x => x.InternalFieldName == field.Name))
+                {
+                    ConfigItem newItem = new ConfigItem();
+                    newItem.InternalFieldName = field.Name;
+                    if (defaultFieldValue is not null)
+                    {
+                        newItem.DefaultValue = field.GetValue(defaultFieldValue);
+                    }
+
+                    if (newItem.DefaultValue == null)
+                    {
+                        newItem.DefaultValue = field.GetValue(referenceConfig);
+                    }
+
+                    NameAttribute? name = field.GetCustomAttribute<NameAttribute>();
+                    DescriptionAttribute? description = field.GetCustomAttribute<DescriptionAttribute>();
+                    DefaultValueAttribute? defaultValue = field.GetCustomAttribute<DefaultValueAttribute>();
+                    ConfigNameAttribute? fullName = field.GetCustomAttribute<ConfigNameAttribute>();
+                    if (description is not null)
+                    {
+                        newItem.Description = description.Description;
+                    }
+
+                    if (name is not null)
+                    {
+                        newItem.ConfigName = name.Name;
+                    }
+
+                    if (fullName is not null)
+                    {
+                        newItem.ConfigName = fullName.ConfigName;
+                    }
+                    else
+                    {
+                        newItem.ConfigName = newItem.Name;
+                    }
+
+                    if (defaultValue is not null)
+                    {
+                        newItem.DefaultValue = defaultValue.DefaultValue;
+                    }
+
+                    string baseType = field.FieldType.Name.Replace("`1", "").Replace("`2", "");
+                    string subType1 = field.FieldType.GenericTypeArguments.Count() >= 1
+                        ? field.FieldType.GenericTypeArguments[0].Name
+                        : "";
+                    string subType2 = field.FieldType.GenericTypeArguments.Count() >= 2
+                        ? field.FieldType.GenericTypeArguments[1].Name
+                        : "";
+
+                    newItem.Type = baseType + (subType1 == "" ? "" : "[" + subType1) +
+                                   (subType2 == "" ? "" : $", {subType2}") + (subType1 != "" ? "]" : "");
+
+                    newConfigs.Add(newItem);
+                }
+            }
+        }
+
+        return obj;
     }
 
     private void WriteMGHIni(MGHConfig conf)

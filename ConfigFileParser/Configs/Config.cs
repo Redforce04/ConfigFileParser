@@ -20,6 +20,8 @@ namespace ConfigFileParser.Configs
         public ConfigStyle OutputConfigStyle { get; set; } = ConfigStyle.MGH;
         public string InputFileLoc { get; set; } = "";
         public string OutputFileLoc { get; set; } = "";
+        public bool AutoUpdate { get; set; } = true;
+        public bool UseCache { get; set; } = false;
         public ParserType InputParserType { get; set; } = ParserType.None;
         internal string AttemptedInputParser = "";
         public ParserType OutputParserType { get; set; } = ParserType.None;
