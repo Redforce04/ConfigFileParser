@@ -1,2 +1,2 @@
-C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\publish\ConfigFileParser.pdb
-C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\publish\ConfigFileParser.exe
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\publish\MGHBetterConfigs.pdb
+C:\Users\redfo\source\repos\ConfigFileParser\ConfigFileParser\bin\Release\net7.0\win-x64\publish\MGHBetterConfigs.exe

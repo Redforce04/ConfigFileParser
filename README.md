@@ -82,3 +82,25 @@ MidnightGhostHuntServer.exe -log -Map=Mansion -Gamename="My MGH Server" -Gamemod
 - `-r` or `--force-reconfigure`: Triggers the initial installation configuration prompts.
 - `-q` or `--quiet`: Removes the banner and unnecessary formatting options.
 - `-qq` or `--quietquiet`: Removes user input from the script and makes any output minimal. (headless / non-interactive operation)
+
+
+
+## Building:
+MGH Better Configs has a slightly complicated system for building. I have laid out the process for updating and rebuilding it for all architectures here.
+
+
+> Most of the tools for building this are designed for windows but can be built for linux (by default it should already work via dotnets multi-architecture design).
+
+During the build the following will happen:
+- The `BlankVersionInfo.txt` file overwrites the `ArgumentParser.cs`.
+- - This file is used for variables that are filled in during the build process. 
+- -  The 3 variables notably identified by the "${}" will be replaced.
+- - This happens with another program called "ReplaceTextWithVariables" (found in project directory)
+- - This helps the program identify git tracking info for the auto-updater.
+- The project is built.
+- The project is published for all architectures. 
+- All builds are renamed, then moved to a /bin/Releases/export folder by default.
+-  - This makes it easy to find all the different builds.
+
+
+#### To easily build the program, use the `Build.bat` or `Build.sh` that is included in the root of the script, and it should output all build files to ConfigFileParser/bin/Release/export, neatly labeled with architectures.

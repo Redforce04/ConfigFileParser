@@ -4,6 +4,16 @@
     <option name="locations">
       <list>
         <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/linux-x64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/win-x64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/win-arm/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/linux-arm64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/linux-musl-x64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/linux-arm/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/osx-x64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/win-arm64/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/win-x86/publish" />
+        <option value="$PROJECT_DIR$/ConfigFileParser/bin/Release/net7.0/portable/publish" />
       </list>
     </option>
   </component>

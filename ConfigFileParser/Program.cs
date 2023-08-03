@@ -1,14 +1,70 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
+using System.Reflection;
 using ConfigFileParser;
 using ConfigFileParser.Components;
 using ConfigFileParser.Configs;
 
 //CosturaUtility.Initialize();
 Config conf = new Config();
-
+conf.Args = args;
 Config.Singleton.Debug = args.Any(x => x == "--debug");
+try
+{
+if (args.Any(x => x == "--updateNew"))
+{
+    Console.WriteLine($"Restarting after rename");
+    string curFile = "";
+    foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
+    {
+        var split = file.Replace("\\", "/");
+        string fileName = split.Split('/')[^1];
+        string fileEnd = fileName.Contains(".") ?  "." + fileName.Split('.')[^1] : "";
+        if (file.Contains("BetterConfigs") && file.Contains("-new"))
+        {
+            File.Copy(file, split.Replace($"/{fileName}", "") + "MGHBetterConfigs" + fileEnd, true);
+        }
+
+        curFile = split.Replace($"/{fileName}", "");
+        break;
+    }
+
+    for (int i = 0; i < args.Length; i++)
+    {
+        string arg = args[i];
+        if (arg == "--updateNew")
+        {
+            args[i] = "--updateRestart";
+            break;
+        }
+    }
+    
+    Process.Start(curFile, args);
+    Environment.Exit(0);
+}
+
+    if (args.Any(x => x == "--updateRestart"))
+    {
+        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
+        {
+            string fileName = file.Replace("\\", "/").Split('/')[^1];
+            if (fileName.Contains("-new") && fileName.Contains("BetterConfigs"))
+            {
+                File.Delete(file);
+                break;
+            }
+        }
+    }
+}
+catch (Exception e)
+{
+    if (Config.Singleton.Debug)
+    {
+        Console.WriteLine(e);
+    }
+}
+
 var unused4 = new CustomTextParser();
 
 CustomTextParser.Singleton.PrintLine("Starting MGH BetterConfigs.");

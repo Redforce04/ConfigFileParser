@@ -17,6 +17,7 @@ namespace ConfigFileParser.Configs
             Singleton = this;
         }
 
+        public string[] Args = new string[] { };
         public ConfigStyle OutputConfigStyle { get; set; } = ConfigStyle.MGH;
         public string InputFileLoc { get; set; } = "";
         public string OutputFileLoc { get; set; } = "";

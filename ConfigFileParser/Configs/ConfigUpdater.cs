@@ -10,7 +10,12 @@
 //    Created Date:     07/29/2023 12:40 PM
 // -----------------------------------------
 
+using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Security.Principal;
 using ConfigFileParser.Components;
 using Newtonsoft.Json.Serialization;
 
@@ -74,21 +79,111 @@ public class ConfigUpdater
             //created_at or published_at
             if (DateTime.Parse(results["created_at"]) > BuiltAt.AddHours(1))
             {
-                CustomTextParser.Singleton.Print("<Warn>An update is available. Please consider updating the program for the latest config options and support.");
+                CustomTextParser.Singleton.Print(
+                    "<Warn>An update is available. Please consider updating the program for the latest config options and support.");
                 /*
                 "upload_url": "https://uploads.github.com/repos/redforce04/MGHBetterConfigs/releases/1/assets{?name,label}",
                 "tarball_url": "https://api.github.com/repos/redforce04/MGHBetterConfigs/tarball/latest",
                 "zipball_url": "https://api.github.com/repos/redforce04/MGHBetterConfigs/zipball/latest",
                  */
-            }
-            else
-            {
-                // CustomTextParser.Singleton.Print("<Accent>It seems you are using a beta build. Some features may be broken.");
+                string uploadUrl =
+                    "https://uploads.github.com/repos/redforce04/MGHBetterConfigs/releases/latest/assets?name=";
+                string uploadId = "MGHBetterConfigs-";
+                if (OperatingSystem.IsLinux())
+                {
+                    uploadId += "linux";
+                }
+                else if (OperatingSystem.IsWindows())
+                {
+                    uploadId += "windows";
+                }
+                else if (OperatingSystem.IsMacOS())
+                {
+                    uploadId += "osx";
+                }
+
+                Architecture arch = RuntimeInformation.OSArchitecture;
+                switch (arch)
+                {
+                    case Architecture.Arm:
+                        uploadId += "-arm";
+                        break;
+                    case Architecture.Arm64:
+                        uploadId += "-arm64";
+                        break;
+                    case Architecture.X64:
+                        uploadId += "-x64";
+                        break;
+                    case Architecture.X86:
+                        uploadId += "-x86";
+                        break;
+                    default:
+                        // Architecture.Armv6 or Architecture.Ppc64le or Architecture.S390x or Architecture.LoongArch64 or wasm
+                        break;
+                }
+
+                if (OperatingSystem.IsWindows())
+                {
+                    uploadId += ".exe";
+                }
+
+                HttpClient client = new HttpClient();
+                var result = client.GetAsync(uploadUrl + uploadId).Result;
+                if (!result.IsSuccessStatusCode)
+                {
+                    CustomTextParser.Singleton.Print(
+                        $"<Warn>Could not find the proper download for the auto-updater. File: <Primary>'{uploadId}'");
+                    return;
+                }
+
+                var data = result.Content.ReadAsStreamAsync().Result;
+                /*var hash = GetHashCode(data, new MD5CryptoServiceProvider());
+                if (Pending.FileHash != hash)
+                {
+                    invalid filehash
+                }
+                else
+                */
+
+                var data1 = result.Content.ReadAsByteArrayAsync().Result;
+                string newFileName = uploadId.Contains(".exe")
+                    ? uploadId.Replace(".exe", "") + "-new.exe"
+                    : uploadId + "-new";
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + newFileName))
+                {
+                    try
+                    {
+                        File.Delete(AppDomain.CurrentDomain.BaseDirectory + newFileName);
+                    }
+                    catch (Exception e)
+                    {
+                        CustomTextParser.Singleton.Print(
+                            $"<Warn>Could not auto-update. Failed to replace the old file. Aborting auto-update process.");
+                        return;
+                    }
+                }
+
+                File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + newFileName, data1);
+                CustomTextParser.Singleton.Print(
+                    $"<Accent>AutoUpdater has downloaded the new updated file and will attempt to restart.");
+                Thread.Sleep(3000);
+                var args = Config.Singleton.Args;
+                args[args.Length] = "--updateNew";
+                var process = Process.Start(AppDomain.CurrentDomain.BaseDirectory + newFileName, args);
+                Environment.Exit(0);
+                //}
             }
         }
-        
     }
-
+    internal static string GetHashCode(Stream stream, HashAlgorithm cryptoService)
+    {
+        using (cryptoService)
+        {
+            var hash = cryptoService.ComputeHash(stream);
+            var hashString = Convert.ToBase64String(hash);
+            return hashString.TrimEnd('=');
+        }
+    }
     public static string Version = "v1.0.1-beta";
     public static DateTime BuiltAt = new DateTime(7,29,2023,20,55,0);
 }
