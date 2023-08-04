@@ -24,8 +24,8 @@ namespace ConfigFileParser;
 
 public class VersionInfo
 {
-    public const string CommitHash = "d28770af";
+    public const string CommitHash = "b7f6c0f0";
     public const string CommitBranch = "master";
     public const string CommitVersion = "v1.0.1-beta";
-    public static DateTime BuildTime = DateTime.Parse("2023-08-04T17:46:24");
+    public static DateTime BuildTime = DateTime.Parse("2023-08-04T17:47:44");
 }
