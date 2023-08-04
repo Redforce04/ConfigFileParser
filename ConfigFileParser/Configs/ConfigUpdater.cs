@@ -184,6 +184,4 @@ public class ConfigUpdater
             return hashString.TrimEnd('=');
         }
     }
-    public static string Version = "v1.0.1-beta";
-    public static DateTime BuiltAt = new DateTime(7,29,2023,20,55,0);
 }

@@ -16,6 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\Build.bat">
+      <Link>Build.bat</Link>
+    </Content>
+    <Content Include="..\Build.sh">
+      <Link>Build.sh</Link>
+    </Content>
     <Content Include="..\LatestConfig.json">
       <Link>LatestConfig.json</Link>
     </Content>

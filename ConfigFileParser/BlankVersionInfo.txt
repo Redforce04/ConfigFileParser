@@ -24,8 +24,8 @@ namespace ConfigFileParser;
 
 public class VersionInfo
 {
-    public const string CommitHash = "${CI_COMMIT_SHORT_SHA}";
-    public const string CommitBranch = "${CI_COMMIT_BRANCH}";
-    public const string CommitVersion = "${CI_COMMIT_VERSION_TAG}";
-    
+    public const string CommitHash = "{CI_COMMIT_SHORT_SHA}";
+    public const string CommitBranch = "{CI_COMMIT_BRANCH}";
+    public const string CommitVersion = "{CI_COMMIT_VERSION_TAG}";
+    public static DateTime BuildTime = DateTime.Parse("{BUILD_DATE_TIME}");
 }
