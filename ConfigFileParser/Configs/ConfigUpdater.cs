@@ -74,10 +74,10 @@ public class ConfigUpdater
             return;
         }
 
-        if (results["tags"] != Version)
+        if (results["tags"] != VersionInfo.CommitVersion)
         {
             //created_at or published_at
-            if (DateTime.Parse(results["created_at"]) > BuiltAt.AddHours(1))
+            if (DateTime.Parse(results["created_at"]) > VersionInfo.BuildTime.AddHours(1))
             {
                 CustomTextParser.Singleton.Print(
                     "<Warn>An update is available. Please consider updating the program for the latest config options and support.");
