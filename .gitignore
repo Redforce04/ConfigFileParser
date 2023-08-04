@@ -425,3 +425,10 @@ FodyWeavers.xsd
 Thumbs.db
 Desktop.ini
 .DS_Store
+/.idea/.idea.ConfigFileParser/.idea/.gitignore
+/.idea/.idea.ConfigFileParser/.idea/dbnavigator.xml
+/.idea/.idea.ConfigFileParser/.idea/encodings.xml
+/.idea/.idea.ConfigFileParser/.idea/indexLayout.xml
+/.idea/.idea.ConfigFileParser/.idea/misc.xml
+/.idea/.idea.ConfigFileParser/.idea/riderPublish.xml
+/.idea/.idea.ConfigFileParser/.idea/vcs.xml
