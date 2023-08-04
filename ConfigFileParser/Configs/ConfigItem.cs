@@ -10,6 +10,7 @@
 //    Created Date:     07/26/2023 1:03 PM
 // -----------------------------------------
 
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace ConfigFileParser.Configs;

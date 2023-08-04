@@ -10,6 +10,7 @@
 //    Created Date:     07/26/2023 1:01 AM
 // -----------------------------------------
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using ConfigFileParser.Configs;
 
@@ -18,7 +19,7 @@ namespace ConfigFileParser.Components;
 [AttributeUsage(AttributeTargets.All)]
 public class CustomParserAttribute : Attribute
 {
-    public virtual object? Parse (out bool skip, ref TextInfo textInfo, Type type)
+    public virtual object? Parse(out bool skip, ref TextInfo textInfo, Type type)
     {
         skip = false;
         int tries = 0;

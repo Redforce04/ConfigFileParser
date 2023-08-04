@@ -20,6 +20,9 @@
         - All builds are move to a /bin/Releases/export folder by default.
         
 */
+
+using System;
+
 namespace ConfigFileParser;
 
 public class VersionInfo
