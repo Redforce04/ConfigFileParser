@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -152,7 +153,18 @@ public class ConfigParser
         switch (Config.Singleton.InputParserType)
         {
             case ParserType.Json:
-                result = Newtonsoft.Json.JsonConvert.SerializeObject(config);
+                try
+                {
+                    result = Newtonsoft.Json.JsonConvert.SerializeObject(config);
+                }
+                catch (Exception e)
+                {
+                    CustomTextParser.Singleton.PrintLine("<Warn>An error has occured, and the custom output config was not able to be serialized.");
+                    if (Config.Singleton.Debug)
+                    {
+                        Console.WriteLine($"{e}");
+                    }
+                }
                 break;
             default:
                 CustomTextParser.Singleton.PrintLine($"<Warn>Input parser {Config.Singleton.InputParserType} is not currently supported.");

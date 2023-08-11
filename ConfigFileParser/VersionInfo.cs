@@ -20,15 +20,14 @@
         - All builds are move to a /bin/Releases/export folder by default.
         
 */
-
-using System;
-
 namespace ConfigFileParser;
 
 public class VersionInfo
 {
-    public const string CommitHash = "b7f6c0f0";
+    public const string CommitHash = "e6a8e098";
     public const string CommitBranch = "master";
-    public const string CommitVersion = "v1.0.1-beta";
-    public static DateTime BuildTime = DateTime.Parse("2023-08-04T17:47:44");
+    public const string CommitVersion = "v1.0.2-beta";
+    public static bool Portable => _portable == "true";
+    private const string _portable = "{PORTABLE}";
+    public static DateTime BuildTime = DateTime.Parse("2023-08-11T03:26:15");
 }

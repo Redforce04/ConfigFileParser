@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,45 +12,71 @@ using ConfigFileParser.Components;
 using ConfigFileParser.Configs;
 
 //CosturaUtility.Initialize();
+
 Config conf = new Config();
 conf.Args = args;
 Config.Singleton.Debug = args.Any(x => x == "--debug");
-try
+if (args.Any(x => x == "--attach-debugger"))
 {
-if (args.Any(x => x == "--updateNew"))
-{
-    Console.WriteLine($"Restarting after rename");
-    string curFile = "";
-    foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
-    {
-        var split = file.Replace("\\", "/");
-        string fileName = split.Split('/')[^1];
-        string fileEnd = fileName.Contains(".") ?  "." + fileName.Split('.')[^1] : "";
-        if (file.Contains("BetterConfigs") && file.Contains("-new"))
-        {
-            File.Copy(file, split.Replace($"/{fileName}", "") + "MGHBetterConfigs" + fileEnd, true);
-        }
-
-        curFile = split.Replace($"/{fileName}", "");
-        break;
-    }
-
-    for (int i = 0; i < args.Length; i++)
-    {
-        string arg = args[i];
-        if (arg == "--updateNew")
-        {
-            args[i] = "--updateRestart";
-            break;
-        }
-    }
-    
-    Process.Start(curFile, args);
-    Environment.Exit(0);
+    Console.WriteLine("Launching Debugger");
+    Debugger.Launch();
 }
 
+try
+{
+    if (args.Any(x => x == "--updateNew"))
+    {
+        Console.WriteLine($"Restarting after rename");
+        string srcFile = "";
+        string destFile = "";
+        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
+        {
+            var split = file.Replace("\\", "/");
+            string fileName = split.Split('/')[^1];
+            string fileEnd = fileName.Contains(".") ? "." + fileName.Split('.')[^1] : "";
+            if (file.Contains("BetterConfigs") && file.Contains("-new") && !file.EndsWith(".dll") &&
+                !file.EndsWith(".pdb") && !file.EndsWith(".deps.json") && !file.EndsWith(".runtimeconfig.json"))
+            {
+                srcFile = file;
+                destFile = split.Replace($"/{fileName}", "") + "/MGHBetterConfigs" + fileEnd;
+                break;
+            }
+        }
+
+        if (conf.Debug)
+        {
+            Console.WriteLine($"Found Source File: {srcFile}, replacing dest file: {destFile}");
+        }
+
+        File.Delete(destFile);
+        File.Copy(srcFile, destFile, true);
+
+        List<string> curArgs = args.ToList();
+        curArgs.Remove($"--updateNew");
+        curArgs.Add("--updateRestart");
+        Process.Start(destFile, curArgs);
+        Environment.Exit(0);
+        return;
+    }
+
+
+}
+catch (Exception e)
+{
+    if (Config.Singleton.Debug)
+    {
+        Console.WriteLine(e);
+    }
+
+    return;
+}
+
+try
+{
     if (args.Any(x => x == "--updateRestart"))
     {
+        CustomTextParser.Singleton.PrintLine("Update installed successfully.");
+        conf.AutoUpdate = false;
         foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
         {
             string fileName = file.Replace("\\", "/").Split('/')[^1];
@@ -63,10 +90,10 @@ if (args.Any(x => x == "--updateNew"))
 }
 catch (Exception e)
 {
-    if (Config.Singleton.Debug)
+    if (conf.Debug)
     {
-        Console.WriteLine(e);
-    }
+        Console.WriteLine($"Caught exception: {e}");
+    }    
 }
 
 var unused4 = new CustomTextParser();

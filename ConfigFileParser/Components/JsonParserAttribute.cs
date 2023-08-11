@@ -144,7 +144,7 @@ public class JsonParserAttribute : CustomParserAttribute
             
             CustomTextParser.Singleton.PrintCustomInput(info);
             var input = Console.ReadLine();
-            if (input is null or "")
+            if (input is null or "" or " ")
             {
                 if (firstTry)
                 {

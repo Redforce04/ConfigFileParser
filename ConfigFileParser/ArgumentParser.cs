@@ -143,7 +143,7 @@ namespace ConfigFileParser
                 
                     switch (argument.ToLower())
                     {
-                        case "--debug":
+                        case "--debug" or "--updateNew" or "--updateRestart" or "--attach-debugger":
                             break;
                         case "-r" or "--force-reconfigure":
                             FileManager.RunInitializerScript = true;
@@ -153,6 +153,13 @@ namespace ConfigFileParser
                             break;
                         case "-c" or "--use-cached-config":
                             Config.Singleton.UseCache = false;
+                            break;
+                        case "--github-api-key":
+                            if (nextArg != "")
+                            {
+                                    Config.Singleton.GithubApiKey = nextArg;
+                                    skipNext = true;
+                            }
                             break;
                         
                         case "-q" or "--quiet":

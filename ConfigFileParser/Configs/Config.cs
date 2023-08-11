@@ -19,6 +19,7 @@ namespace ConfigFileParser.Configs
 
         public string[] Args = new string[] { };
         public ConfigStyle OutputConfigStyle { get; set; } = ConfigStyle.MGH;
+        public string GithubApiKey { get; set; } = "";
         public string InputFileLoc { get; set; } = "";
         public string OutputFileLoc { get; set; } = "";
         public bool AutoUpdate { get; set; } = true;

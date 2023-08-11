@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using ConfigFileParser.Components;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 // ReSharper disable InconsistentNaming
 
@@ -280,7 +280,7 @@ namespace ConfigFileParser.Configs
             { "T-Rex Bite", DamageMethod.TRex_Bite },
             { "Skeleton Attack", DamageMethod.Skeleton_Attack },
         };
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum DamageMethod
         {
             Spectral_Cannon, Grenade, Ghostsmasher, Project_X, Trap, Poltergeist,
@@ -324,7 +324,7 @@ namespace ConfigFileParser.Configs
             { "Ghostsmasher", HunterGadget.Ghostsmasher },
             { "CamCorder", HunterGadget.CamCorder },
         };
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum HunterGadget
         {
             Spectral_Cannon, Radar, Pathfinder, Trap, Grenade, Defibrillator,
@@ -354,7 +354,7 @@ namespace ConfigFileParser.Configs
             { "Overkill", HunterPerk.Overkill },
         };
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum HunterPerk
         {
             Lightweight, Juggernaut, Coldblooded, Healing_Aura, Quick_Reload,
@@ -385,7 +385,7 @@ namespace ConfigFileParser.Configs
             { "Deflector", GhostAbility.Deflector  },
         };
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum GhostAbility
         {
             Doppelganger, Phantom, Telekinesis, Corruptor, Spirit, Miasma, Apparition, Death_Grip, Poltergeist, Trickster, Deflector
@@ -412,7 +412,7 @@ namespace ConfigFileParser.Configs
             { "Hallucinate", GhostHaunt.Hallucinate },
 
         };
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum GhostHaunt
         {
             Chill, Cold_Spot, False_Trail, Push_Object, Medium, Health_Orb, Shove_Hunter, Hallucinate
@@ -440,7 +440,7 @@ namespace ConfigFileParser.Configs
             { "Quickcharge", GhostPerk.Quickcharge },
 
         };
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
         public enum GhostPerk
         {
             Heavyweight, Ghostly_Reach, Shatterproof, Ghostly_Focus, Foreseer, Perception, Untrappable, Ectoslow, Glutton, Blast_Resistant, Quickcharge

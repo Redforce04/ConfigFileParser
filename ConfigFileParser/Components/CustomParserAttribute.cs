@@ -37,16 +37,19 @@ public class CustomParserAttribute : Attribute
             textInfo.CurrentTry = tries;
             CustomTextParser.Singleton.PrintCustomInput(textInfo);
             string? input = Console.ReadLine();
-            if (input is null || input == "")
+            if (input is null || input == "" || input == " " || input == "skip")
             {
                 Console.WriteLine("Skipping config.");
                 break;
             }
             previousInput = input;
-
+            if (input == "finish")
+            {
+                CustomTextParser.Singleton.Print("<Primary>'Finish'<Warn> cannot be used here. Please input the value you would like to be used.");
+            }
             try
             {
-
+                
                 return Convert.ChangeType(input, type);
             }
             catch (FormatException)

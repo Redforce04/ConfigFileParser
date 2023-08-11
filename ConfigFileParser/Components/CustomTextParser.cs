@@ -23,7 +23,7 @@ public class CustomTextParser
 {
     public static CustomTextParser Singleton;
     private static string Billboard = @"<Accent>  __  __  _____ _    _   ____       _   _             _____             __ _           " + "\n" + @" |  \/  |/ ____| |  | | |  _ \     | | | |           / ____|           / _(_)           " + "\n" + @" | \  / | |  __| |__| | | |_) | ___| |_| |_ ___ _ __| |     ___  _ __ | |_ _  __ _ ___  " + "\n" + @" | |\/| | | |_ |  __  | |  _ < / _ | __| __/ _ | '__| |    / _ \| '_ \|  _| |/ _` / __| " + "\n" + @" | |  | | |__| | |  | | | |_) |  __| |_| ||  __| |  | |___| (_) | | | | | | | (_| \__ \ " + "\n" + @" |_|  |_|\_____|_|  |_| |____/ \___|\__|\__\___|_|   \_____\___/|_| |_|_| |_|\__, |___/ " + "\n" + @"                                                                              __/ |     " + "\n" + @"                                                                             |___/      ";
-    private static string Banner = @"<SecondaryAccent>MGH BetterConfigs - by Redforce04"; 
+    private static string Banner = $"<SecondaryAccent>MGH BetterConfigs {VersionInfo.CommitVersion} - by Redforce04{(Config.Singleton.Debug ? $" <DarkGreen>[{VersionInfo.CommitBranch} - {VersionInfo.CommitHash}]" : "")}"; 
 
     public CustomTextParser()
     {
@@ -33,25 +33,38 @@ public class CustomTextParser
     public void PrintLine(string line)
     {
         Console.Clear();
-        if (!Config.Singleton.Silent)
-        {
-            Print(Billboard);
-            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
-        }
+        _printHeader();
 
         Print(line);
     }
+
+    private void _printHeader()
+    {
+        if (!Config.Singleton.Silent)
+        {
+            Print(Billboard);
+            int billboardLength = Billboard.Split('\n')[0].Length - _getCharacterWidth(Billboard.Split("\n")[0]);
+            int bannerLength = Banner.Length + (_getCharacterWidth(Banner));
+            int padLength =  (bannerLength + billboardLength)/2;// / 2;
+            // padLength = billboardLength ;
+           Print(Banner.PadLeft(padLength)+ "\n");
+        }
+        
+        
+    }
+    //88 
+//banner - 88
+//<SecondaryAccent><DarkGreen> // 29
+// 
+//MGH BetterConfigs v1.0.2-beta - by Redforce04 [master - e6a8e098] //68
+
     public void PrintCustomInput(TextInfo info)
     {
         // 88
         // 88 - text.count /2
 
         Console.Clear();
-        if (!Config.Singleton.Silent)
-        {
-            Print(Billboard);
-            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
-        }
+        _printHeader();
 
         Print($"<Primary>Current Config: <Accent>{info.ConfigName} <Primary>({info.ConfigType}) - Config [<Accent>{info.CurrentConfigNum} <Primary>/ {info.TotalConfigNum}]");
         Print($"<Primary>{info.Description} (default: <Accent>{info.DefaultValue}<Primary>)");
@@ -77,11 +90,7 @@ public class CustomTextParser
     public void PrintConfigSummary(TextInfo info)
     {
         Console.Clear();
-        if (!Config.Singleton.Silent)
-        {
-            Print(Billboard);
-            Print(Banner.PadLeft((Billboard.Split("\n")[0].Length + Banner.Length) / 2) + "\n");
-        }
+        _printHeader();
 
         Print($"{info.Description}");
         /*foreach (string instructionLine in info.Instruction.Split('\n'))
@@ -95,6 +104,28 @@ public class CustomTextParser
             Print(str);
         }
     }
+
+    private int _getCharacterWidth(string txt)
+    {
+        string colors = "|";
+        foreach (ConsoleColor en in Enum.GetValuesAsUnderlyingType<ConsoleColor>())
+        {
+            colors += $"|{en.ToString()}";
+        }
+
+        colors = colors.Replace("||", "");
+        colors += "|Primary|Accent|SecondaryAccent|Secondary|Warn|Error";
+        var regex = new Regex(@"<(" + colors + @".*?)>");
+        var matches = regex.Matches(txt);
+        int length = 0;
+        foreach (Match match in matches)
+        {
+            length += match.Length;
+        }
+        Console.WriteLine();
+
+        return length;
+    } 
     internal void Print(string text)
     {
         string newText = text;
