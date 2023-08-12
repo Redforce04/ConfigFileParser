@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using ConfigFileParser.Components;
 using Newtonsoft.Json.Converters;
@@ -14,6 +15,7 @@ namespace ConfigFileParser.Configs
         [Description("What damage types should have custom multipliers?")]
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public Dictionary<Enums.DamageMethod, float> CustomDamageMods = new Dictionary<Enums.DamageMethod, float>();
 
         [Name("Banned Hunter Weapon / Gadgets")]
@@ -21,6 +23,7 @@ namespace ConfigFileParser.Configs
         [Description("What hunter weapons / gadgets should be banned from being used.")]
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public List<Enums.HunterGadget> BannedHunterWeaponGadgets = new List<Enums.HunterGadget>();
 
         [Name("Banned Hunter Perks")]
@@ -28,6 +31,7 @@ namespace ConfigFileParser.Configs
         [Description("What hunter perks should be banned from being used.")]
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public List<Enums.HunterPerk> BannedHunterPerks = new List<Enums.HunterPerk>();
 
         [Name("Banned Ghost Abilities")]
@@ -35,6 +39,7 @@ namespace ConfigFileParser.Configs
         [Description("What ghost abilities should be banned from being used.")] 
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public List<Enums.GhostAbility> BannedGhostAbilities = new List<Enums.GhostAbility>();
         
         [Name("Banned Ghost Haunts")]
@@ -42,6 +47,7 @@ namespace ConfigFileParser.Configs
         [Description("What ghost haunts should be banned from being used.")]
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public List<Enums.GhostHaunt> BannedGhostHaunts = new List<Enums.GhostHaunt>();
 
         [Name("Banned Ghost Perks")]
@@ -49,6 +55,7 @@ namespace ConfigFileParser.Configs
         [Description("What ghost perks should be banned from being used.")]
         [JsonParser]
         [DefaultValue("Empty")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public List<Enums.GhostPerk> BannedGhostPerks = new List<Enums.GhostPerk>();
 
         [Name("Force Choose Team")]
@@ -280,15 +287,72 @@ namespace ConfigFileParser.Configs
             { "T-Rex Bite", DamageMethod.TRex_Bite },
             { "Skeleton Attack", DamageMethod.Skeleton_Attack },
         };
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum DamageMethod
         {
-            Spectral_Cannon, Grenade, Ghostsmasher, Project_X, Trap, Poltergeist,
-            Ghost_Attack, Doppelganger, Harpoon_Bazooka, Miasma_Burn, Sledgehammer,
-            Reaper, Reaper_Bolt_Explosion, Salt_Shotgun, Ghost_Punch, Ship_Cannon,
-            Corruption, Chest_Bite, Frostbite, Telekinesis, C4, Reaper_Bolt_Zap,
-            Harpoon_Bazooka_Zap, Riot_Shield_Bash, Flamethrower, Gargoyle_Attack,
-            Forklift_Attack, Knight_Sword, Fridge_Attack, Door_Attack, TRex_Bite,
+            [EnumMember(Value = "Spectral Cannon")]
+            Spectral_Cannon,
+            [EnumMember(Value = "Grenade")]
+            Grenade,
+            [EnumMember(Value = "Ghostsmasher")]
+            Ghostsmasher,
+            [EnumMember(Value = "Project X")] 
+            Project_X, 
+            [EnumMember(Value = "Trap")]
+            Trap, 
+            [EnumMember(Value = "Poltergeist")]
+            Poltergeist,
+            [EnumMember(Value = "Ghost Attack")]
+            Ghost_Attack, 
+            [EnumMember(Value = "Doppelganger")]
+            Doppelganger, 
+            [EnumMember(Value = "Harpoon Bazooka")]
+            Harpoon_Bazooka, 
+            [EnumMember(Value = "Miasma Burn")]
+            Miasma_Burn, 
+            [EnumMember(Value = "Sledgehammer")]
+            Sledgehammer,
+            [EnumMember(Value = "Reaper")]
+            Reaper, 
+            [EnumMember(Value = "Reaper Bolt Explosion")]
+            Reaper_Bolt_Explosion, 
+            [EnumMember(Value = "Salt Shotgun")]
+            Salt_Shotgun, 
+            [EnumMember(Value = "Ghost Punch")]
+            Ghost_Punch, 
+            [EnumMember(Value = "Ship Cannon")]
+            Ship_Cannon,
+            [EnumMember(Value = "Corruption")]
+            Corruption, 
+            [EnumMember(Value = "Chest Bite")]
+            Chest_Bite, 
+            [EnumMember(Value = "Frostbite")]
+            Frostbite, 
+            [EnumMember(Value = "Telekinesis")]
+            Telekinesis, 
+            [EnumMember(Value = "C4")]
+            C4, 
+            [EnumMember(Value = "Reaper Bolt Zap")]
+            Reaper_Bolt_Zap,
+            [EnumMember(Value = "Harpoon Bazooka Zap")]
+            Harpoon_Bazooka_Zap, 
+            [EnumMember(Value = "Riot Shield Bash")]
+            Riot_Shield_Bash,
+            [EnumMember(Value = "Flamethrower")]
+            Flamethrower, 
+            [EnumMember(Value = "Gargoyle Attack")]
+            Gargoyle_Attack,
+            [EnumMember(Value = "Forklift Attack")]
+            Forklift_Attack, 
+            [EnumMember(Value = "Knight Sword")]
+            Knight_Sword, 
+            [EnumMember(Value = "Fridge Attack")]
+            Fridge_Attack, 
+            [EnumMember(Value = "Door Attack")]
+            Door_Attack, 
+            [EnumMember(Value = "T-Rex Bite")]
+            TRex_Bite,
+            [EnumMember(Value = "Skeleton Attack")]
             Skeleton_Attack
         }
         public static HunterGadget GetHunterGadget(this string translation)
@@ -324,13 +388,51 @@ namespace ConfigFileParser.Configs
             { "Ghostsmasher", HunterGadget.Ghostsmasher },
             { "CamCorder", HunterGadget.CamCorder },
         };
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum HunterGadget
         {
-            Spectral_Cannon, Radar, Pathfinder, Trap, Grenade, Defibrillator,
-            Project_X, Harpoon_Bazooka, Sledgehammer, Reaper, Grappling_Hook,
-            Vacuum, Salt_Shotgun, Spectrophone, Frostbite, C4, Riot_Shield,
-            Medic_Kit, Flamethrower, Ghostsmasher, CamCorder
+            [EnumMember(Value = "Spectral Cannon")]
+            Spectral_Cannon, 
+            [EnumMember(Value = "Radar")]
+            Radar, 
+            [EnumMember(Value = "Pathfinder")]
+            Pathfinder, 
+            [EnumMember(Value = "Trap")]
+            Trap, 
+            [EnumMember(Value = "Grenade")]
+            Grenade, 
+            [EnumMember(Value = "Defibrillator")]
+            Defibrillator,
+            [EnumMember(Value = "Project X")]
+            Project_X, 
+            [EnumMember(Value = "Harpoon Bazooka")]
+            Harpoon_Bazooka, 
+            [EnumMember(Value = "Sledgehammer")]
+            Sledgehammer, 
+            [EnumMember(Value = "Reaper")]
+            Reaper, 
+            [EnumMember(Value = "Grappling Hook")]
+            Grappling_Hook,
+            [EnumMember(Value = "Vacuum")]
+            Vacuum, 
+            [EnumMember(Value = "Salt Shotgun")]
+            Salt_Shotgun, 
+            [EnumMember(Value = "Spectrophone")]
+            Spectrophone, 
+            [EnumMember(Value = "Frostbite")]
+            Frostbite, 
+            [EnumMember(Value = "C4")]
+            C4, 
+            [EnumMember(Value = "Riot Shield")]
+            Riot_Shield,
+            [EnumMember(Value = "Medic Kit")]
+            Medic_Kit, 
+            [EnumMember(Value = "Flamethrower")]
+            Flamethrower, 
+            [EnumMember(Value = "Ghostsmasher")]
+            Ghostsmasher, 
+            [EnumMember(Value = "CamCorder")]
+            CamCorder
         }
         public static HunterPerk GetHunterPerk(this string translation)
         {
@@ -354,11 +456,27 @@ namespace ConfigFileParser.Configs
             { "Overkill", HunterPerk.Overkill },
         };
 
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum HunterPerk
         {
-            Lightweight, Juggernaut, Coldblooded, Healing_Aura, Quick_Reload,
-            Extended_Mag, Extra_Gear, Gadgeteer, Overkill
+            [EnumMember(Value = "Lightweight")]
+            Lightweight, 
+            [EnumMember(Value = "Juggernaut")]
+            Juggernaut, 
+            [EnumMember(Value = "Coldblooded")]
+            Coldblooded, 
+            [EnumMember(Value = "Healing Aura")]
+            Healing_Aura, 
+            [EnumMember(Value = "Quick Reload")]
+            Quick_Reload,
+            [EnumMember(Value = "Extended Mag")]
+            Extended_Mag, 
+            [EnumMember(Value = "Extra Gear")]
+            Extra_Gear, 
+            [EnumMember(Value = "Gadgeteer")]
+            Gadgeteer, 
+            [EnumMember(Value = "Overkill")]
+            Overkill
         }
 
         public static GhostAbility GetGhostAbility(this string translation)
@@ -379,16 +497,37 @@ namespace ConfigFileParser.Configs
             { "Spirit", GhostAbility.Spirit },
             { "Miasma", GhostAbility.Miasma },
             { "Apparition", GhostAbility.Apparition },
-            { "Death_Grip", GhostAbility.Death_Grip },
+            { "Death Grip", GhostAbility.Death_Grip },
             { "Poltergeist", GhostAbility.Poltergeist },
             { "Trickster", GhostAbility.Trickster },
             { "Deflector", GhostAbility.Deflector  },
         };
 
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum GhostAbility
         {
-            Doppelganger, Phantom, Telekinesis, Corruptor, Spirit, Miasma, Apparition, Death_Grip, Poltergeist, Trickster, Deflector
+            [EnumMember(Value = "Doppelganger")]
+            Doppelganger, 
+            [EnumMember(Value = "Phantom")]
+            Phantom, 
+            [EnumMember(Value = "Telekinesis")]
+            Telekinesis, 
+            [EnumMember(Value = "Corruptor")]
+            Corruptor, 
+            [EnumMember(Value = "Spirit")]
+            Spirit, 
+            [EnumMember(Value = "Miasma")]
+            Miasma, 
+            [EnumMember(Value = "Apparition")]
+            Apparition, 
+            [EnumMember(Value = "Death Grip")]
+            Death_Grip, 
+            [EnumMember(Value = "Poltergeist")]
+            Poltergeist, 
+            [EnumMember(Value = "Trickster")]
+            Trickster, 
+            [EnumMember(Value = "Deflector")]
+            Deflector
         }
 
         public static GhostHaunt GetGhostHaunt(this string translation)
@@ -403,19 +542,34 @@ namespace ConfigFileParser.Configs
         public static Dictionary<string, GhostHaunt> GhostHauntDict = new Dictionary<string, GhostHaunt>()
         {
             { "Chill", GhostHaunt.Chill },
-            { "Cold_Spot", GhostHaunt.Cold_Spot },
-            { "False_Trail", GhostHaunt.False_Trail },
-            { "Push_Object", GhostHaunt.Push_Object },
+            { "Cold Spot", GhostHaunt.Cold_Spot },
+            { "False Trail", GhostHaunt.False_Trail },
+            { "Push Object", GhostHaunt.Push_Object },
             { "Medium", GhostHaunt.Medium },
-            { "Health_Orb", GhostHaunt.Health_Orb },
-            { "Shove_Hunter", GhostHaunt.Shove_Hunter },
+            { "Health Orb", GhostHaunt.Health_Orb },
+            { "Shove Hunter", GhostHaunt.Shove_Hunter },
             { "Hallucinate", GhostHaunt.Hallucinate },
 
         };
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum GhostHaunt
         {
-            Chill, Cold_Spot, False_Trail, Push_Object, Medium, Health_Orb, Shove_Hunter, Hallucinate
+            [EnumMember(Value = "Chill")]
+            Chill, 
+            [EnumMember(Value = "Cold Spot")]
+            Cold_Spot, 
+            [EnumMember(Value = "False Trail")]
+            False_Trail, 
+            [EnumMember(Value = "Push Object")]
+            Push_Object, 
+            [EnumMember(Value = "Medium")]
+            Medium, 
+            [EnumMember(Value = "Health Orb")]
+            Health_Orb, 
+            [EnumMember(Value = "Shove Hunter")]
+            Shove_Hunter, 
+            [EnumMember(Value = "Hallucinate")]
+            Hallucinate
         }
         public static GhostPerk GetGhostPerk(this string translation)
         {
@@ -428,22 +582,43 @@ namespace ConfigFileParser.Configs
         public static Dictionary<string, GhostPerk> GhostPerkDict = new Dictionary<string, GhostPerk>()
         {
             { "Heavyweight", GhostPerk.Heavyweight },
-            { "Ghostly_Reach", GhostPerk.Ghostly_Reach },
+            { "Ghostly Reach", GhostPerk.Ghostly_Reach },
             { "Shatterproof", GhostPerk.Shatterproof },
-            { "Ghostly_Focus", GhostPerk.Ghostly_Focus },
+            { "Ghostly Focus", GhostPerk.Ghostly_Focus },
             { "Foreseer", GhostPerk.Foreseer },
             { "Perception", GhostPerk.Perception },
             { "Untrappable", GhostPerk.Untrappable },
             { "Ecto-slow", GhostPerk.Ectoslow },
             { "Glutton", GhostPerk.Glutton },
-            { "Blast_Resistant", GhostPerk.Blast_Resistant },
+            { "Blast Resistant", GhostPerk.Blast_Resistant },
             { "Quickcharge", GhostPerk.Quickcharge },
 
         };
-        [Newtonsoft.Json.JsonConverter(typeof(JsonStringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public enum GhostPerk
         {
-            Heavyweight, Ghostly_Reach, Shatterproof, Ghostly_Focus, Foreseer, Perception, Untrappable, Ectoslow, Glutton, Blast_Resistant, Quickcharge
+            [EnumMember(Value = "Heavyweight")]
+            Heavyweight, 
+            [EnumMember(Value = "Ghostly Reach")]
+            Ghostly_Reach,
+            [EnumMember(Value = "Shatterproof")]
+            Shatterproof, 
+            [EnumMember(Value = "Ghostly Focus")]
+            Ghostly_Focus, 
+            [EnumMember(Value = "Foreseer")]
+            Foreseer, 
+            [EnumMember(Value = "Perception")]
+            Perception, 
+            [EnumMember(Value = "Untrappable")]
+            Untrappable, 
+            [EnumMember(Value = "Ecto-slow")]
+            Ectoslow, 
+            [EnumMember(Value = "Glutton")]
+            Glutton, 
+            [EnumMember(Value = "Blast Resistant")]
+            Blast_Resistant, 
+            [EnumMember(Value = "Quickcharge")]
+            Quickcharge
         }
     }
 

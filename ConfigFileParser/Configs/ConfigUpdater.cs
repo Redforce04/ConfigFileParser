@@ -9,7 +9,7 @@
 //    Revision Date:    07/29/2023 12:40 PM
 //    Created Date:     07/29/2023 12:40 PM
 // -----------------------------------------
-// git tag -a [tag name (ex: v1.0.1-beta)] -m [message name: (fix auto updater)]
+// git tag -a [tag name (ex: v1.0.1-beta)] -m "[message name: (fix auto updater)]"
 // git push origin [tag name]
 
 using System;
@@ -38,7 +38,94 @@ public class ConfigUpdater
     {
         SerializableConfig.Latest = new SerializableConfig();
         Singleton = this;
-        if (!Config.Singleton.UseCache)
+
+        string res = "";
+        if (Config.Singleton.DevelopmentMode)
+        {
+            CustomTextParser.Singleton.Print(
+                "Development Mode has been detected. Would you like to use the cached config, or fetch the latest git config, or use the local latest config.\n" +
+                "Options: \n" +
+                "- Use Cached Config (MGHConfig) <White>'mgh'<Primary>\n" +
+                "- Use Git Config <Accent>'git'<Primary>\n" +
+                "- Use Local Latest Config (LatestConfig) <White>'latest [configLocation]'<Primary>");
+            string? shouldUseCache = Console.ReadLine();
+            if (shouldUseCache is null or "")
+            {
+                goto Git;
+            }
+            string[] useCacheSplit = shouldUseCache.Split(" ");
+            switch (useCacheSplit[0].ToLower())
+            {
+                case "mgh":
+                    Config.Singleton.UseCache = true;
+                    goto ConfigUpdater;
+                case "git":
+                    goto Git;
+                case "latest":
+                    if (useCacheSplit.Length > 1)
+                    {
+                        try
+                        {
+                            string loc = shouldUseCache.Substring(7, shouldUseCache.Length - 8);
+                            if (loc is "default" or "" or " ")
+                            {
+                                loc = "../../../../LatestConfig.json";
+                            }
+                            res = File.ReadAllText(loc);
+                            SerializableConfig? updatedConfig = JsonConvert.DeserializeObject<SerializableConfig>(res);
+                            if (updatedConfig is not null)
+                            {
+                                SerializableConfig.Latest = updatedConfig;
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Could not parse config.");
+                        }
+                    }
+                    goto ConfigUpdater;
+                    string curDirectory = AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/");
+                    bool latestConfigFound = false;
+                    string navDirectory = curDirectory;
+                    while (!latestConfigFound)
+                    {
+                        var split = navDirectory.Split("/");
+                        if (split.Length < 1)
+                        {
+                            CustomTextParser.Singleton.Print(
+                                "Could not find latest config directory. Using cache instead.");
+                            Config.Singleton.UseCache = true;
+                            goto ConfigUpdater;
+                        }
+
+                        string newDirectory = "";
+                        for (int i = 0; i < split.Length - 1; i++)
+                        {
+                            newDirectory += split[i] + "/";
+                        }
+
+
+                        string? file = Directory.GetFiles(newDirectory).FirstOrDefault(x => x.EndsWith("LatestConfig.json"));
+                        if (file is not null && file != "")
+                        {
+                            try
+                            {
+                                res = File.ReadAllText(file);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Could not open LatestConfig.json.");
+                            }
+                        }
+                    }
+                    
+                    break;
+            }
+        }
+        
+        Git:
+        if (Config.Singleton.DevelopmentMode || !Config.Singleton.UseCache)
         {
             HttpClient client = new HttpClient();
             var result = client
@@ -46,10 +133,14 @@ public class ConfigUpdater
                 .Result;
             try
             {
-                var updatedConfig = result.Content.ReadFromJsonAsync<SerializableConfig>().Result;
+                res = result.Content.ReadAsStringAsync().Result;
+                SerializableConfig? updatedConfig = JsonConvert.DeserializeObject<SerializableConfig>(res);
+                //var updatedConfig = result.Content.ReadFromJsonAsync<SerializableConfig>().Result;
                 if (updatedConfig is not null)
                 {
                     SerializableConfig.Latest = updatedConfig;
+                    CustomTextParser.Singleton.Print($"<Primary>Fetched latest config.");
+                    SleepManager.Sleep(1000);
                 }
                 else
                 {
@@ -67,15 +158,20 @@ public class ConfigUpdater
                 }
             }
         }
-
+        ConfigUpdater:
+        if (Config.Singleton.DevelopmentMode)
+        {
+            CustomTextParser.Singleton.Print("Program will not auto-update, because its in development mode.");
+            SleepManager.Sleep(2000);
+        }
         if (!Config.Singleton.AutoUpdate)
         {
             return;
         }
-
+        
         try
         {
-
+            
             HttpClient updateClient = new HttpClient();
             if (Config.Singleton.GithubApiKey != "")
             {
@@ -86,7 +182,7 @@ public class ConfigUpdater
             updateClient.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue("Redforce04-MGHBetterConfigs", VersionInfo.CommitVersion));
             var response = updateClient
                 .GetAsync(@"https://api.github.com/repos/Redforce04/MGHBetterConfigs/releases/latest").Result.Content;
-            var json = response.ReadAsStringAsync().Result;
+            string json = response.ReadAsStringAsync().Result;
             Dictionary<string, object>? results = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             if (results == null || results.Count < 3 || !results.ContainsKey("tag_name") || !results.ContainsKey("created_at"))
             {

@@ -33,7 +33,7 @@ public class FileManager
         if (!File.Exists(Config.Singleton.InputFileLoc))
         {
             Console.WriteLine("No pre-existing configuration files have been found.");
-            Thread.Sleep(3000);
+            SleepManager.Sleep(3000);
             RunInitializerScript = true;
         }
 

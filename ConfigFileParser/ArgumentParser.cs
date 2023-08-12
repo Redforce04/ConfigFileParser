@@ -116,15 +116,16 @@ namespace ConfigFileParser
                     CustomTextParser.Singleton.PrintLine($"<Warn>Could not find MidnightGhostHuntServer.exe automatically. Please manually specify the location.");
                     result = "";
                     
-                    if(Config.Singleton.Debug) Thread.Sleep(6000);
+                    if(Config.Singleton.Debug) SleepManager.Sleep(2000);
                     return;
                 }
                 result = rootDirectory;
             }
 
             result = "";
-            if(Config.Singleton.Debug) Thread.Sleep(6000);
+            if(Config.Singleton.Debug) SleepManager.Sleep(2000);
         }
+
         private void processArgs(string[] args)
         {
             bool skipNext = false;
@@ -136,99 +137,274 @@ namespace ConfigFileParser
                     skipNext = false;
                     continue;
                 }
+
                 string argument = args[i];
-                string? nextArg = (i + 1 == args.Length ) ? null : args[i + 1];
+                string? nextArg = (i + 1 == args.Length) ? null : args[i + 1];
 
                 // if (conf.Debug) Console.WriteLine($"Argument: {argument}");
-                
-                    switch (argument.ToLower())
-                    {
-                        case "--debug" or "--updateNew" or "--updateRestart" or "--attach-debugger":
-                            break;
-                        case "-r" or "--force-reconfigure":
-                            FileManager.RunInitializerScript = true;
-                            break;
-                        case "--no-auto-updater":
+
+                switch (argument.ToLower())
+                {
+                    case "--debug":
+                        Config.Singleton.Debug = true;
+                        break;
+                    case "--development-mode":
+                        Config.Singleton.DevelopmentMode = true;
+                        break;
+                    case "--attach-debugger":
+                        if (!Config.Singleton.AttachDebugger)
+                        {
+                            Debugger.Launch();
+                        }
+                        Config.Singleton.AttachDebugger = true;
+                        break;
+                    case "--interactive-startup":
+                        Config.Singleton.InteractiveStartup = true;
+                        break;
+                    case "-r" or "--force-reconfigure":
+                        FileManager.RunInitializerScript = true;
+                        break;
+                    case "--no-auto-updater":
+                        Config.Singleton.AutoUpdate = false;
+                        break;
+                    case "-c" or "--use-cached-config":
+                        Config.Singleton.UseCache = true;
+                        break;
+                    case "--github-api-key":
+                        if (nextArg != "")
+                        {
+                            Config.Singleton.GithubApiKey = nextArg;
+                            skipNext = true;
+                        }
+
+                        break;
+                    case "--color-test":
+                        Console.WriteLine("Testing Console Colors: ");
+                        List<ConsoleColor> rainbow = new List<ConsoleColor>()
+                        {
+                            ConsoleColor.Black, ConsoleColor.DarkGray, ConsoleColor.Gray,
+                            ConsoleColor.White, ConsoleColor.DarkRed, ConsoleColor.Red, 
+                            ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Green,
+                            ConsoleColor.DarkGreen, ConsoleColor.Cyan, ConsoleColor.DarkCyan,
+                            ConsoleColor.Blue, ConsoleColor.DarkBlue, ConsoleColor.Magenta,
+                            ConsoleColor.DarkMagenta,
+                        };
+                        List<ConsoleColor> colorsCategorized = new List<ConsoleColor>()
+                        {
+                            ConsoleColor.Black, ConsoleColor.DarkGray, ConsoleColor.Gray,
+                            ConsoleColor.White, ConsoleColor.Red, ConsoleColor.Yellow,
+                            ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Blue, 
+                            ConsoleColor.Magenta, ConsoleColor.DarkRed, ConsoleColor.DarkYellow,
+                            ConsoleColor.DarkGreen, ConsoleColor.DarkCyan, ConsoleColor.DarkBlue,
+                            ConsoleColor.DarkMagenta,
+                        };
+                        List<ConsoleColor> brightness = new List<ConsoleColor>()
+                        {
+                            ConsoleColor.Black, ConsoleColor.DarkGray, ConsoleColor.DarkRed,
+                            ConsoleColor.DarkYellow, ConsoleColor.DarkGreen, ConsoleColor.DarkCyan, 
+                            ConsoleColor.DarkBlue, ConsoleColor.DarkMagenta, ConsoleColor.Gray,
+                            ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green,
+                            ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Magenta,
+                            ConsoleColor.White,
+                        };
+                        List<ConsoleColor> activeList = brightness;
+                        if (nextArg != null)
+                        {
+                            switch (nextArg)
+                            {
+                                case "rainbow":
+                                    activeList = rainbow;
+                                    break;
+                                case "categorized":
+                                    activeList = colorsCategorized;
+                                    break;
+                                case "brightness":
+                                    activeList = brightness;
+                                    break;
+                                case "all":
+                                    activeList = Enum.GetValues<ConsoleColor>().ToList();
+                                    break;
+                            }
+                        }
+                        foreach (ConsoleColor color in activeList)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write($"[");
+                            Console.ForegroundColor = color;
+                            Console.Write($"[{color} - color]");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write($"]\n");
+                        }
+
+                        Console.WriteLine("Ending App in 5 seconds.");
+                        Thread.Sleep(5000);
+                        Environment.Exit(0);
+                        break;
+                    case "-q" or "--quiet":
+                        Config.Singleton.Silent = true;
+                        break;
+                    case "-qq" or "--quietquiet":
+                        Config.Singleton.Silent = true;
+                        Config.Singleton.SuperSilent = true;
+                        break;
+                    case "--theme":
+                        if (nextArg != null)
+                        {
+                            switch (nextArg)
+                            {
+                                case "pterodactyl":
+                                    Config.ExportedColorScheme = ColorSchemes.Pterodactyl;
+                                    break;
+                                case "linux":
+                                    Config.ExportedColorScheme = ColorSchemes.Linux;
+                                    break;
+                                case "windows":
+                                    Config.ExportedColorScheme = ColorSchemes.Windows;
+                                    break;
+                            }
+
+                            skipNext = true;
+                        }
+
+                        break;
+                    case "-i" or "--input-parsing":
+                        if (nextArg == null)
+                        {
+                            CustomTextParser.Singleton.PrintLine($"<Warn>You must specify a valid parsing method after -i or --input-parsing");
+                            ParsedSuccessfully = false;
+                            return;
+                        }
+
+                        Config.Singleton.AttemptedInputParser = nextArg;
+                        Config.Singleton.InputParserType = Enum.Parse<ParserType>(nextArg, true);
+                        if (Config.Singleton.Debug)
+                            Console.WriteLine($"Input Parsing: {Config.Singleton.InputParserType}");
+                        skipNext = true;
+                        break;
+                    case "-o" or "--output-parsing":
+                        if (nextArg == null)
+                        {
+                            CustomTextParser.Singleton.PrintLine($"<Warn>You must specify a valid parsing method after -o or --output-parsing");
+                            ParsedSuccessfully = false;
+                            return;
+                        }
+
+                        Config.Singleton.AttemptedOutputParser = nextArg;
+                        Config.Singleton.OutputParserType = Enum.Parse<ParserType>(nextArg, true);
+                        if (Config.Singleton.Debug)
+                            Console.WriteLine($"Output Parsing: {Config.Singleton.InputParserType}");
+                        skipNext = true;
+                        break;
+                    default:
+                        if (Config.Singleton.InputFileLoc == "")
+                        {
+                            Config.Singleton.InputFileLoc = argument;
+                            if (Config.Singleton.Debug)
+                                Console.WriteLine($"Input Loc: {Config.Singleton.InputFileLoc}");
+                            if (Config.Singleton.InputParserType != ParserType.None)
+                            {
+                                break;
+                            }
+
+                            string[] subArray = Config.Singleton.InputFileLoc.Split(".");
+                            Config.Singleton.AttemptedInputParser = subArray[subArray.Length - 1];
+                            Config.Singleton.InputParserType =
+                                Enum.Parse<ParserType>(Config.Singleton.AttemptedInputParser, true);
+
+                        }
+                        else
+                        {
+
+                            Config.Singleton.OutputFileLoc = argument;
+                            if (Config.Singleton.Debug)
+                                Console.WriteLine($"Output Loc: {Config.Singleton.OutputFileLoc}");
+                            if (Config.Singleton.OutputParserType != ParserType.None)
+                            {
+                                break;
+                            }
+
+                            string[] subArray = Config.Singleton.OutputFileLoc.Split(".");
+                            Config.Singleton.AttemptedOutputParser = subArray[subArray.Length - 1];
+
+                            Config.Singleton.OutputParserType =
+                                Enum.Parse<ParserType>(Config.Singleton.AttemptedOutputParser, true);
+                        }
+
+                        break;
+                    case "--updateNew":
+                        try
+                        {
+                            CustomTextParser.Singleton.PrintLine($"<Warn>Restarting after rename");
+                            string srcFile = "";
+                            string destFile = "";
+                            foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
+                            {
+                                var split = file.Replace("\\", "/");
+                                string fileName = split.Split('/')[^1];
+                                string fileEnd = fileName.Contains(".") ? "." + fileName.Split('.')[^1] : "";
+                                if (file.Contains("BetterConfigs") && file.Contains("-new") &&
+                                    !file.EndsWith(".dll") &&
+                                    !file.EndsWith(".pdb") && !file.EndsWith(".deps.json") &&
+                                    !file.EndsWith(".runtimeconfig.json"))
+                                {
+                                    srcFile = file;
+                                    destFile = split.Replace($"/{fileName}", "") + "/MGHBetterConfigs" + fileEnd;
+                                    break;
+                                }
+                            }
+
+                            if (Config.Singleton.Debug)
+                            {
+                                Console.WriteLine($"Found Source File: {srcFile}, replacing dest file: {destFile}");
+                            }
+
+                            File.Delete(destFile);
+                            File.Copy(srcFile, destFile, true);
+
+                            List<string> curArgs = args.ToList();
+                            curArgs.Remove($"--updateNew");
+                            curArgs.Add("--updateRestart");
+                            Process.Start(destFile, curArgs);
+                            Environment.Exit(0);
+
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            if (Config.Singleton.Debug)
+                            {
+                                Console.WriteLine(e);
+                            }
+
+                            Environment.Exit(0);
+                            return;
+                        }
+                    case "--updateRestart":
+                        try
+                        {
+                            CustomTextParser.Singleton.PrintLine("Update installed successfully.");
                             Config.Singleton.AutoUpdate = false;
-                            break;
-                        case "-c" or "--use-cached-config":
-                            Config.Singleton.UseCache = false;
-                            break;
-                        case "--github-api-key":
-                            if (nextArg != "")
+                            foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
                             {
-                                    Config.Singleton.GithubApiKey = nextArg;
-                                    skipNext = true;
-                            }
-                            break;
-                        
-                        case "-q" or "--quiet":
-                            Config.Singleton.Silent = true;
-                            break;
-                        case "-qq" or "--quietquiet":
-                            Config.Singleton.Silent = true;
-                            Config.Singleton.SuperSilent = true;
-                            break;
-                        case "-i" or "--input-parsing":
-                            if (nextArg == null)
-                            {
-                                Console.WriteLine($"You must specify a valid parsing method after -i or --input-parsing");
-                                ParsedSuccessfully = false;
-                                return;
-                            }
-                            Config.Singleton.AttemptedInputParser = nextArg;
-                            Config.Singleton.InputParserType = Enum.Parse<ParserType>(nextArg, true);
-                            if (Config.Singleton.Debug) Console.WriteLine($"Input Parsing: {Config.Singleton.InputParserType}");
-                            skipNext = true;
-                            break;
-                        case "-o" or "--output-parsing":
-                            if (nextArg == null)
-                            {
-                                Console.WriteLine($"You must specify a valid parsing method after -o or --output-parsing");
-                                ParsedSuccessfully = false;
-                                return;
-                            }
-                            Config.Singleton.AttemptedOutputParser = nextArg;
-                            Config.Singleton.OutputParserType = Enum.Parse<ParserType>(nextArg, true);
-                            if (Config.Singleton.Debug) Console.WriteLine($"Output Parsing: {Config.Singleton.InputParserType}");
-                            skipNext = true;
-                            break;
-                        default:
-                            if (Config.Singleton.InputFileLoc == "")
-                            {
-                                Config.Singleton.InputFileLoc = argument;
-                                if (Config.Singleton.Debug) Console.WriteLine($"Input Loc: {Config.Singleton.InputFileLoc}");
-                                if (Config.Singleton.InputParserType != ParserType.None)
+                                string fileName = file.Replace("\\", "/").Split('/')[^1];
+                                if (fileName.Contains("-new") && fileName.Contains("BetterConfigs"))
                                 {
+                                    File.Delete(file);
                                     break;
                                 }
-
-                                string[] subArray = Config.Singleton.InputFileLoc.Split(".");
-                                Config.Singleton.AttemptedInputParser = subArray[subArray.Length - 1];
-                                Config.Singleton.InputParserType = Enum.Parse<ParserType>(Config.Singleton.AttemptedInputParser, true);
-
                             }
-                            else
+                        }
+                        catch (Exception e)
+                        {
+                            if (Config.Singleton.Debug)
                             {
-
-                                Config.Singleton.OutputFileLoc = argument;
-                                if (Config.Singleton.Debug) Console.WriteLine($"Output Loc: {Config.Singleton.OutputFileLoc}");
-                                if (Config.Singleton.OutputParserType != ParserType.None)
-                                {
-                                    break;
-                                }
-
-                                string[] subArray = Config.Singleton.OutputFileLoc.Split(".");
-                                Config.Singleton.AttemptedOutputParser = subArray[subArray.Length - 1];
-
-                                Config.Singleton.OutputParserType = Enum.Parse<ParserType>(Config.Singleton.AttemptedOutputParser, true);
+                                Console.WriteLine($"Caught exception: {e}");
                             }
+                        }
 
-                            break;
-                    }
-
-
+                        break;
                 }
+            }
         }
 
         private void verifyResults()

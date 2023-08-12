@@ -18,12 +18,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using ConfigFileParser.Components;
 using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ThreadState = System.Threading.ThreadState;
 
 namespace ConfigFileParser.Configs;
 
@@ -39,105 +41,184 @@ public class ConfigParser
     {
         MGHConfig conf = new MGHConfig();
         SerializableConfig serializableConfig = new SerializableConfig();
+        
+        Console.Clear();
+        //string? res = CustomTextParser.Singleton.PrintCoundown("<Primary>The program will run through all configs individually." +
+        //"\n<Primary>You can skip this, and use default configs by typing <White>'skip'<Primary> now, or continue by pressing <White>'[Enter]'<Primary>. [<Accent>{remainingDuration} <Primary>/ {totalDuration} seconds].", 10f);
+        CustomTextParser.Singleton.Print("<Primary>The program will run through all configs individually." +
+                                             "\n<Primary>Press <White>'Enter'<Primary> to continue, or type <White>'Skip'<Primary> to skip this and just use the default config.");
+        string? res = Console.ReadLine();
+        if(res is not null && res.ToLower() == "skip")
+        {
+            CustomTextParser.Singleton.PrintLine("Skipping configuration process, and using default configs.");
+            SleepManager.Sleep(2000);
+            serializableConfig = SerializableConfig.Latest;
+            goto GenerateFiles;
+        }
 
+        if (!Config.Singleton.UseCache)
+        {
+            foreach (var defaultItem in serializableConfig.Items)
+            {
+                
+            }
+            goto GenerateFiles;
+        }
         var fields = conf.GetType().GetRuntimeFields();
         TextInfo info = new TextInfo();
-        info.TotalConfigNum = fields.Count();
+        var fieldInfos = fields as FieldInfo[] ?? fields.ToArray();
+        var serializableConfItems = SerializableConfig.Latest.Items;
+        info.TotalConfigNum = fieldInfos.Count();
         int itemCount = 0;
-        foreach (var item in fields)
+        for(int i = 0; i < (Config.Singleton.UseCache ? info.TotalConfigNum : SerializableConfig.Latest.Items.Count); i++)
+        //foreach (var item in fields)
         {
-            itemCount++;
-            info.CurrentConfigNum = itemCount;
-            string baseType = item.FieldType.Name.Replace("`1", "").Replace("`2", "");
-            string subType1 = item.FieldType.GenericTypeArguments.Count() >= 1
-                ? item.FieldType.GenericTypeArguments[0].Name
-                : "";
-            string subType2 = item.FieldType.GenericTypeArguments.Count() >= 2
-                ? item.FieldType.GenericTypeArguments[1].Name
-                : "";
-
-
-            info.ConfigType = baseType + (subType1 == "" ? "" : "[" + subType1) +
-                              (subType2 == "" ? "" : $", {subType2}") + (subType1 != "" ? "]" : "");
-            NameAttribute? name = item.GetCustomAttribute<NameAttribute>();
-            DescriptionAttribute? description = item.GetCustomAttribute<DescriptionAttribute>();
-            DefaultValueAttribute? defaultValue = item.GetCustomAttribute<DefaultValueAttribute>();
-            ConfigNameAttribute? fullName = item.GetCustomAttribute<ConfigNameAttribute>();
-            if (description is not null)
+            ConfigItem confItem;
+            FieldInfo item;
+            if (!Config.Singleton.UseCache)
             {
-                info.Description = description.Description;
-            }
-
-            if (name is not null)
-            {
-                info.ConfigName = name.Name;
-            }
-
-            if (fullName is not null)
-            {
-                info.ConfigFullName = fullName.ConfigName;
-            }
-            else
-            {
-                info.ConfigFullName = info.ConfigName;
-            }
-
-            if (defaultValue is not null)
-            {
-                info.DefaultValue = defaultValue.DefaultValue;
-            }
-            else
-            {
-                info.DefaultValue = (item.GetValue(conf) is null) ? "N/A" : item.GetValue(conf)!.ToString()!;
-                // if(Config.Singleton.Debug) Console.WriteLine("");
-            }
-
-            ConfigItem confItem = new ConfigItem()
-            {
-                Description = info.Description,
-                DefaultValue = info.DefaultValue,
-                Name = info.ConfigName,
-                ConfigName = info.ConfigFullName,
-                Type = info.ConfigType,
-                InternalFieldName = item.Name,
-                Value = null
-            };
-            var jsonParser = item.GetCustomAttribute<JsonParserAttribute>();
-            if (jsonParser is not null)
-            {
-                if(Config.Singleton.Debug) Console.WriteLine($"Json Parsing");
-                info.Instruction = JsonParserAttribute.Instruction;
-                var result = jsonParser.Parse(out bool skip, ref info, item.FieldType);
-                if (!skip)
+                confItem = serializableConfItems[i];
+                info.ConfigType = confItem.Type;
+                info.ConfigFullName = confItem.ConfigName;
+                info.ConfigName = confItem.Name;
+                // info.ConfigType = confItem.InternalFieldName;
+                info.Description = confItem.Description;
+                // info.ConfigType = confItem.Value;
+                info.DefaultValue = confItem.DefaultValue?.ToString() ?? "Empty";
+                
+                var newJsonParser = new JsonParserAttribute();
+                if (newJsonParser is not null)
                 {
-                    item.SetValue(conf, Convert.ChangeType(result, item.FieldType));
+                    if(Config.Singleton.Debug) Console.WriteLine($"Json Parsing");
+                    info.Instruction = JsonParserAttribute.Instruction;
+                    var result = newJsonParser.Parse(out bool skip, ref info, confItem.DefaultValue?.GetType() ?? typeof(List<object>));
+                    if (!skip)
+                    {
+                        confItem.Value = Convert.ChangeType(result, confItem.DefaultValue?.GetType() ?? typeof(List<object>));
+                    }
+
+                    serializableConfig.Items.Add(confItem);
+
+                    continue;
+                }
+
+                var newParser = new CustomParserAttribute();
+                if (newParser is null)
+                {
+                    continue;
+                }
+                if(Config.Singleton.Debug) Console.WriteLine($"Normal Parsing");
+
+                info.Instruction = CustomParserAttribute.Instruction;
+
+                var newParserResult = newParser.Parse(out bool newSkipParser, ref info, confItem.DefaultValue?.GetType() ?? typeof(object));
+                if (!newSkipParser)
+                {
+                   confItem.Value = Convert.ChangeType(newParserResult, confItem.DefaultValue?.GetType() ?? typeof(object));
+                }
+
+                serializableConfig.Items.Add(confItem);
+                continue;
+            }
+            else
+            {
+
+                item = fieldInfos[i];
+                itemCount++;
+                info.CurrentConfigNum = itemCount;
+                string baseType = item.FieldType.Name.Replace("`1", "").Replace("`2", "");
+                string subType1 = item.FieldType.GenericTypeArguments.Count() >= 1
+                    ? item.FieldType.GenericTypeArguments[0].Name
+                    : "";
+                string subType2 = item.FieldType.GenericTypeArguments.Count() >= 2
+                    ? item.FieldType.GenericTypeArguments[1].Name
+                    : "";
+
+
+                info.ConfigType = baseType + (subType1 == "" ? "" : "[" + subType1) +
+                                  (subType2 == "" ? "" : $", {subType2}") + (subType1 != "" ? "]" : "");
+                NameAttribute? name = item.GetCustomAttribute<NameAttribute>();
+                DescriptionAttribute? description = item.GetCustomAttribute<DescriptionAttribute>();
+                DefaultValueAttribute? defaultValue = item.GetCustomAttribute<DefaultValueAttribute>();
+                ConfigNameAttribute? fullName = item.GetCustomAttribute<ConfigNameAttribute>();
+                if (description is not null)
+                {
+                    info.Description = description.Description;
+                }
+
+                if (name is not null)
+                {
+                    info.ConfigName = name.Name;
+                }
+
+                if (fullName is not null)
+                {
+                    info.ConfigFullName = fullName.ConfigName;
+                }
+                else
+                {
+                    info.ConfigFullName = info.ConfigName;
+                }
+
+                if (defaultValue is not null)
+                {
+                    info.DefaultValue = defaultValue.DefaultValue;
+                }
+                else
+                {
+                    info.DefaultValue = (item.GetValue(conf) is null) ? "N/A" : item.GetValue(conf)!.ToString()!;
+                    // if(Config.Singleton.Debug) Console.WriteLine("");
+                }
+
+                confItem = new ConfigItem()
+                {
+                    Description = info.Description,
+                    DefaultValue = info.DefaultValue,
+                    Name = info.ConfigName,
+                    ConfigName = info.ConfigFullName,
+                    Type = info.ConfigType,
+                    InternalFieldName = item.Name,
+                    Value = null
+                };
+                var jsonParser = item.GetCustomAttribute<JsonParserAttribute>();
+                if (jsonParser is not null)
+                {
+                    if (Config.Singleton.Debug) Console.WriteLine($"Json Parsing");
+                    info.Instruction = JsonParserAttribute.Instruction;
+                    var result = jsonParser.Parse(out bool skip, ref info, item.FieldType);
+                    if (!skip)
+                    {
+                        item.SetValue(conf, Convert.ChangeType(result, item.FieldType));
+                    }
+
+                    confItem.Value = item.GetValue(conf);
+                    serializableConfig.Items.Add(confItem);
+
+                    continue;
+                }
+
+                var parser = item.GetCustomAttribute<CustomParserAttribute>();
+                if (parser is null)
+                {
+                    continue;
+                }
+
+                if (Config.Singleton.Debug) Console.WriteLine($"Normal Parsing");
+
+                info.Instruction = CustomParserAttribute.Instruction;
+
+                var parserResult = parser.Parse(out bool skipParser, ref info, item.FieldType);
+                if (!skipParser)
+                {
+                    item.SetValue(conf, Convert.ChangeType(parserResult, item.FieldType));
                 }
 
                 confItem.Value = item.GetValue(conf);
                 serializableConfig.Items.Add(confItem);
-
-                continue;
             }
-
-            var parser = item.GetCustomAttribute<CustomParserAttribute>();
-            if (parser is null)
-            {
-                continue;
-            }
-            if(Config.Singleton.Debug) Console.WriteLine($"Normal Parsing");
-
-            info.Instruction = CustomParserAttribute.Instruction;
-
-            var parserResult = parser.Parse(out bool skipParser, ref info, item.FieldType);
-            if (!skipParser)
-            {
-                item.SetValue(conf, Convert.ChangeType(parserResult, item.FieldType));
-            }
-
-            confItem.Value = item.GetValue(conf);
-            serializableConfig.Items.Add(confItem);
         }
 
+GenerateFiles:
         GenerateInputFile(serializableConfig);
         GenerateOutputFile(conf);
         info = new TextInfo();
@@ -155,7 +236,7 @@ public class ConfigParser
             case ParserType.Json:
                 try
                 {
-                    result = Newtonsoft.Json.JsonConvert.SerializeObject(config);
+                    result = JsonConvert.SerializeObject(config, Formatting.Indented);
                 }
                 catch (Exception e)
                 {
@@ -168,7 +249,7 @@ public class ConfigParser
                 break;
             default:
                 CustomTextParser.Singleton.PrintLine($"<Warn>Input parser {Config.Singleton.InputParserType} is not currently supported.");
-                Thread.Sleep(4000);
+                SleepManager.Sleep(4000);
                 break;
         }
 
@@ -181,20 +262,20 @@ public class ConfigParser
             CustomTextParser.Singleton.PrintLine(
                 $"<Warn>Could not write configs to file '{Config.Singleton.InputFileLoc}'. (Access Violation Exception)" +
                 $"\nEnsure you have permissions to write here, and that no programs are open that may be using this file.");
-            Thread.Sleep(6000);
+            SleepManager.Sleep(6000);
         }
         catch (UnauthorizedAccessException)
         {
             CustomTextParser.Singleton.PrintLine(
                 $"<Warn>Could not write configs to file '{Config.Singleton.InputFileLoc}'. (Unauthorized Access Exception)" +
                 $"\nEnsure you have permissions to write here, and that no programs are open that may be using this file.");
-            Thread.Sleep(6000);
+            SleepManager.Sleep(6000);
         }
         catch (Exception e)
         {
             CustomTextParser.Singleton.PrintLine($"<Warn>Could not write configs to file '{Config.Singleton.InputFileLoc}'. (Exception)");
             if (Config.Singleton.Debug) Console.WriteLine($"{e}");
-            Thread.Sleep(5000);
+            SleepManager.Sleep(5000);
         }
         
     }
@@ -211,20 +292,20 @@ public class ConfigParser
             CustomTextParser.Singleton.PrintLine(
                 $"<Warn>Could not read configs from file '{Config.Singleton.InputFileLoc}'. (Access Violation Exception)" +
                 $"\nEnsure you have permissions to read here, and that no programs are open that may be using this file.");
-            Thread.Sleep(6000);
+            SleepManager.Sleep(6000);
         }
         catch (UnauthorizedAccessException)
         {
             CustomTextParser.Singleton.PrintLine(
                 $"<Warn>Could not read configs from file '{Config.Singleton.InputFileLoc}'. (Unauthorized Access Exception)" +
                 $"\nEnsure you have permissions to read here, and that no programs are open that may be using this file.");
-            Thread.Sleep(6000);
+            SleepManager.Sleep(6000);
         }
         catch (Exception e)
         {
             CustomTextParser.Singleton.PrintLine(
                 $"<Warn>Could not read configs from file '{Config.Singleton.InputFileLoc}'. (Exception)");
-            Thread.Sleep(4000);
+            SleepManager.Sleep(4000);
             if (Config.Singleton.Debug) Console.WriteLine($"{e}");
         }
 
@@ -240,7 +321,7 @@ public class ConfigParser
                 catch (Exception e)
                 {
                     CustomTextParser.Singleton.PrintLine("<Warn>Input file is corrupted or invalid.");
-                    Thread.Sleep(3000);
+                    SleepManager.Sleep(3000);
                     if (Config.Singleton.Debug) Console.WriteLine($"{e}");
                 }
 
@@ -248,7 +329,7 @@ public class ConfigParser
             default:
                 CustomTextParser.Singleton.PrintLine(
                     "<Warn>The input parsing method selected is not currently supported.");
-                Thread.Sleep(4000);
+                SleepManager.Sleep(4000);
                 break;
         }
 
@@ -266,7 +347,7 @@ public class ConfigParser
             try
             {
                 CustomTextParser.Singleton.PrintLine("<Primary>Deleting old config.");
-                Thread.Sleep(3000);
+                SleepManager.Sleep(3000);
                 File.Delete(Config.Singleton.InputFileLoc);
             }
             catch (Exception e)
@@ -275,7 +356,7 @@ public class ConfigParser
                     "<Warn>Could not delete the input file. Ensure you have permissions to write to this file, and ensure it is not in use.");
                 if (Config.Singleton.Debug) Console.WriteLine(e);
             }
-
+            RunInitializationScript();
             return;
         }
 
@@ -288,26 +369,25 @@ public class ConfigParser
         bool newConfigsChanged = newConfigs.Count > 0;
         bool configsChanged = changedConfigs.Count > 0;
         
-        string info = $"<Warn>Since you last configured mgh with this tool:";
+        string info = $"<Primary>Since you last configured mgh with this tool: ";
         // "X new config option[s] (have / has) been added."
         if (oldConfigsChanged) 
         {
-            info +=
-                $"{(newConfigs.Count > 0 ? $"{newConfigs.Count} new config option{(newConfigs.Count == 1 ? "" : "s")} {(newConfigs.Count == 1 ? "has" : "have")} been added." : "")} ";
+            info +=$"<DarkRed>{(oldConfigs.Count > 0 ? $"{oldConfigs.Count} config option{(oldConfigs.Count == 1 ? "" : "s")} {(oldConfigs.Count == 1 ? "has" : "have")} been removed." : "")} ";
         }
         // "X config option[s] (have/has) been removed."
         if (newConfigsChanged)
         {
             // info += $"{(newConfigs.Count > 0 && oldConfigs.Count > 0 ? "and" : "to")}";
-            info +=$"{(oldConfigs.Count > 0 ? $"{oldConfigs.Count} config option{(oldConfigs.Count == 1 ? "" : "s")} {(oldConfigs.Count == 1 ? "has" : "have")} been removed." : "")} ";
+            info += $"<DarkGreen>{(newConfigs.Count > 0 ? $"{newConfigs.Count} new config option{(newConfigs.Count == 1 ? "" : "s")} {(newConfigs.Count == 1 ? "has" : "have")} been added." : "")} ";
         }
         // X config option[s] (have/has) been changed.
         if (configsChanged)
         {
-            info += $"{(changedConfigs.Count > 0 ? $"{changedConfigs.Count} config option{(changedConfigs.Count == 1 ? "" : "s")} {(changedConfigs.Count == 1 ? "has" : "have")} been changed." : "")} ";
+            info += $"<Blue>{(changedConfigs.Count > 0 ? $"{changedConfigs.Count} config option{(changedConfigs.Count == 1 ? "" : "s")} {(changedConfigs.Count == 1 ? "has" : "have")} been changed." : "")} ";
         }
 
-        info += $"\nA download may be necessary in order to properly utilize the latest config.\n";
+        info += $"\n<Secondary>--A download may be necessary in order to properly utilize the latest config.\n";
         if (newConfigs.Count > 0)
         {
             string newConfs = "";
@@ -316,7 +396,7 @@ public class ConfigParser
                 newConfs += $"<DarkGreen>+{newConf.Name}<Secondary>, ";
             }
             //info += $"<Warn>{NewFields.Count} new config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been added to MGH since you last configured mgh with this tool.\n";
-            info += $"<Primary>New Configs: <Secondary>[{newConfs},<Secondary>]\n".Replace(", ,", "");
+            info += $"<Primary>New Configs: <Secondary>[ {newConfs},<Secondary> ]\n".Replace(", ,", "");
         }
 
         if (oldConfigs.Count > 0)
@@ -327,7 +407,18 @@ public class ConfigParser
                 oldConfs += $"<DarkRed>-{oldConf.Name}<Secondary>, ";
             }
             //info += $"<Warn>{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from MGH since you last configured mgh with this tool.\n";
-            info += $"<Primary>Old Configs: <Secondary>[{oldConfs},<Secondary>]\n".Replace(", ,", "");
+            info += $"<Primary>Old Configs: <Secondary>[ {oldConfs},<Secondary> ]\n".Replace(", ,", "");
+
+        }
+        if (changedConfigs.Count > 0)
+        {
+            string changedConfs = "";
+            foreach (ConfigItem changedConf in oldConfigs)
+            {
+                changedConfs += $"<Blue>{changedConf.Name}<Secondary>, ";
+            }
+            //info += $"<Warn>{OldFields.Count} config option{(NewFields.Count == 1 ? "" : "s")} {(NewFields.Count == 1 ? "has" : "have")} been removed from MGH since you last configured mgh with this tool.\n";
+            info += $"<Primary>Changed Configs: <Secondary>[ {changedConfs},<Secondary> ]\n".Replace(", ,", "");
 
         }
 
@@ -336,18 +427,18 @@ public class ConfigParser
         if (oldConfigs.Count == 0 && newConfigs.Count == 0)
         {
             CustomTextParser.Singleton.PrintLine("<Primary>All configs up to date.");
-            Thread.Sleep(2000);
+            SleepManager.Sleep(2000);
         }
         else
         {
             
             //info += $"<Primary>Would you like to {(OldFields.Count == 0 ? "" : $"remove old configs {(NewFields.Count == 0 ? "" : "and ")}")}{(OldFields.Count == 0 ? "" : "configure new configs")}? (Yes / No)";
-            info += "<Primary>Would you like to reconfigure server configs, and overwrite old configs? (Yes / No)";
+            info += "<Primary>Would you like to reconfigure server configs, and overwrite old configs? (Yes / <Accent>No<Primary>)";
             CustomTextParser.Singleton.PrintLine(info);
             string? lineread = Console.ReadLine();
             if (lineread is null || lineread == "" || lineread.ToLower() == "no" || lineread.ToLower() == "n")
             {
-                // skip   
+                // skip  
             }
             else
             {
@@ -549,6 +640,7 @@ public class ConfigParser
     private void WriteMGHIni(MGHConfig conf)
     {
         CustomTextParser.Singleton.PrintLine("Outputting the config options that will be written to the output file.");
+        SleepManager.Sleep(2000);
         string output = "";
         var fields = conf.GetType().GetFields();
         foreach (var field in fields)
@@ -613,12 +705,17 @@ public class ConfigParser
                 //Console.WriteLine(field.FieldType.Name);  
             }
         }
-        
-        Console.WriteLine(output);
-        Thread.Sleep(5000);
-        CustomTextParser.Singleton.PrintLine($"Writing Output File.");
+
+        foreach (string item in output.Split("\n"))
+        {
+            Console.WriteLine(item);
+            SleepManager.Sleep(250);
+        }
+        // Console.WriteLine(output);
+        SleepManager.Sleep(2500);
+        CustomTextParser.Singleton.Print($"<Primary>Writing Output File.");
         //Console.Read();
-        Thread.Sleep(3000);
+        SleepManager.Sleep(3000);
         try
         {
             File.WriteAllText(Config.Singleton.OutputFileLoc, output);

@@ -12,10 +12,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using ConfigFileParser.Configs;
+using ThreadState = System.Threading.ThreadState;
 
 namespace ConfigFileParser.Components;
 
@@ -37,7 +39,76 @@ public class CustomTextParser
 
         Print(line);
     }
+    /// <summary>
+    /// Deprecated.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="countdownDurationInSeconds"></param>
+    /// <param name="readInput"></param>
+    /// <returns></returns>
+    private string? PrintCoundown(string text, float countdownDurationInSeconds = 5, bool readInput = true)
+    {
+        Thread _countdownThread = new Thread(() => _printCountdownInternally(text, countdownDurationInSeconds));
+        _countdownThread.Name = "Countdown Text Thread";
+        _countdownThread.Start();
+        if (!readInput)
+        {
+            return null;
+        }
+        try
+        {
+            /*string query = Reader.ReadLine((int)countdownDurationInSeconds*1000);
+            _countdownThread.Interrupt();
+            return query;*/
+        }
+        catch (TimeoutException)
+        {
+            if (_countdownThread.ThreadState is ThreadState.Running or ThreadState.Background)
+            {
+                _countdownThread.Interrupt();
+            }
+        }
+        // renames '{remainingDuration}' to time left, and '{totalDuration}' to the totalDuration.    
+        // runs on an independent thread    
+        return null;
+    }
 
+    private void _printCountdownInternally(string text, float countdownDuration)
+    {
+        try
+        {
+
+            if (!text.Contains("{remainingDuration"))
+            {
+                Print(text.Replace("{totalDuration}", ((int)countdownDuration).ToString()));
+                Thread.Sleep((int)countdownDuration * 1000);
+                return;
+            }
+            int totalDurationInMilliseconds = (int)countdownDuration * 1000;
+            int remainingDuration = totalDurationInMilliseconds;
+            Stopwatch stopwatch = new Stopwatch();
+            while (remainingDuration > 0)
+            {
+                stopwatch.Start();
+                Console.Clear();
+                int rem = remainingDuration / 1000;
+                int tot = (int)countdownDuration;
+
+                string txt = (text
+                    .Replace("{remainingDuration}", rem.ToString())
+                    .Replace("{totalDuration}", tot.ToString()));
+                Print(txt);
+                int sleepDuration = (remainingDuration > 1000) ? 1000 : remainingDuration;
+                stopwatch.Stop();
+                Thread.Sleep(sleepDuration - (int)stopwatch.ElapsedMilliseconds);
+                remainingDuration -= sleepDuration;
+            }
+        }
+        catch (ThreadInterruptedException)
+        {
+            
+        }
+    }
     private void _printHeader()
     {
         if (!Config.Singleton.Silent)
@@ -208,7 +279,7 @@ public class CustomTextParser
 
     public static Dictionary<string, ConsoleColor> ActiveColorScheme => Config.ExportedColorScheme switch
     {
-        ColorSchemes.Console => ConsoleColorScheme,
+        ColorSchemes.Windows => ConsoleColorScheme,
         ColorSchemes.Linux => LinuxColorScheme,
         ColorSchemes.Pterodactyl => PterodactylColorScheme,
         _ => ConsoleColorScheme

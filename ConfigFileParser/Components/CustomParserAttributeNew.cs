@@ -35,39 +35,15 @@ namespace ConfigFileParser.Components;
 
 
 [AttributeUsage(AttributeTargets.All)]
-public class JsonParserAttribute : CustomParserAttribute
+public class CustomParserAttribute : Attribute
 {
-    public override object? Parse(out bool skip, ref TextInfo info, Type type)
+    public virtual object? Parse(out bool skip, ref TextInfo info, Type type)
     {
         
         bool showInvalidWarning = false;
         PreviousAction previousAction = PreviousAction.None;
         object obj = type.GetConstructor(Type.EmptyTypes)!.Invoke(new object[] { });
         skip = false;
-        bool firstTry = true;
-        bool isList = type.IsGenericList();
-        bool isDict = type.IsGenericDict();
-        if (!isDict && !isList)
-        {
-            CustomTextParser.Singleton.PrintLine("<Warn>Warning: Custom list parser is intended for dictionaries / lists. " +
-                                                 "\nIt is being used to parse an object that is not a dictionary / list. " +
-                                                 "\nThis config will be skipped, and the default will be used.");
-            skip = true;
-            return null;
-        }
-
-        if (isDict)
-        {
-            var instructions = Instruction.Split('\n');
-            instructions[0] =
-                "<Secondary>For each dictionary entry, separate the key and value with an <White>'='<Secondary>. Press enter to submit that entry";
-            info.Instruction = "";
-            foreach (string x in instructions)
-            {
-                info.Instruction += $"\n{x}";
-            }
-        }
-        string? lastEntry = "";
         int failedTries = 0;
         while (failedTries < 3)
         {
@@ -103,30 +79,6 @@ public class JsonParserAttribute : CustomParserAttribute
 
                 }
             }
-            string currentListItems = "<Secondary>,";
-            if (isList)
-            {
-                foreach (object listObj in ((IList)obj))
-                {
-                    currentListItems += $", {listObj}";
-                }
-            }
-            else if (isDict)
-            {
-                foreach (DictionaryEntry dictObj in ((IDictionary)obj))
-                {
-                    currentListItems += $", <Accent>{dictObj.Key}<Secondary> [<SecondaryAccent>{dictObj.Value}<Secondary>]";
-                }
-            }
-
-            if (((ICollection)obj).Count == 0)
-            {
-                currentListItems = currentListItems.Remove(currentListItems.Length - 1, 1) + "<Accent>No Items";
-            }
-            currentListItems = currentListItems.Replace(",, ", "");
-            
-            info.CustomStrings.Add($"<Primary>Current values: <Secondary>[<Accent>{currentListItems}<Secondary>]");
-            
 
             if (showInvalidWarning)
             {
@@ -146,24 +98,12 @@ public class JsonParserAttribute : CustomParserAttribute
             var input = Console.ReadLine();
             if (input is null or "" or " ")
             {
-                if (firstTry)
-                {
-                    showInvalidWarning = false;
-                    previousAction = PreviousAction.Skip;
+                    CustomTextParser.Singleton.Print("\n<Primary> Skipping config. Default config will be used.");
+                    SleepManager.Sleep(1000);
                     skip = true;
-                    break;
-                }
-                else
-                {
-                    info.ErrorString += $"<Warn>Type <White>'finish'<Warn> or <White>'skip'<Warn> when done. Blank entries only skip on the first input.\n";
-                }
+                    return null;
             }
-            if (firstTry)
-            {
-                firstTry = false;
-            }
-            lastEntry = input;
-
+            
             bool finished = false;
             switch (input.Split(" ")[0].ToLower())
             {
@@ -174,63 +114,12 @@ public class JsonParserAttribute : CustomParserAttribute
                     break;
                 case "finish":
                     previousAction = PreviousAction.Finish;
-                    CustomTextParser.Singleton.Print("\n<Primary>Config finished. Moving on to next config.");
+                    CustomTextParser.Singleton.Print("\n<Primary> Skipping config. Default config will be used.");
                     SleepManager.Sleep(1000);
                     continue;
                 case "list":
                     previousAction = PreviousAction.List;
                     continue;
-                case "remove":
-                    showInvalidWarning = true;
-                    previousAction = PreviousAction.Remove;
-                    string itemToRemove = "";
-                    bool initial = true;
-                    foreach (string arg in input.Split(' '))
-                    {
-                        if (!initial)
-                        {
-                            itemToRemove += $"{arg} ";
-                        }
-                        else
-                            initial = false;
-                    }
-                    object? argValue = ProcessArg(itemToRemove, type.GenericTypeArguments[0]);
-                    if (argValue is null)
-                    {
-                        failedTries++;
-                        info.ErrorString += $"<Warn>Could not remove the item due to parsing. Could not parse item <White>'{itemToRemove}'\n";
-                        continue;
-                    }
-
-                    if (isDict)
-                    {
-                        if (((IDictionary)obj).Contains(argValue))
-                        {
-                            ((IDictionary)obj).Remove(argValue);
-                        }
-                        else
-                        {
-                            failedTries++;
-                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the dictionary.\n";
-                            continue;
-                        }
-                    }
-                    else if (isList)
-                    {
-                        if (((IList)obj).Contains(argValue))
-                        {
-                            ((IList)obj).Remove(argValue);
-                        }
-                        else
-                        {
-                            failedTries++;
-                            info.ErrorString += $"<Warn>Item <White>'{argValue}'<Warn> was not found in the list.\n";
-                            continue;
-                        }
-                    }
-
-                    showInvalidWarning = false;
-                    break;
                 default:
                     showInvalidWarning = true;
                     previousAction = PreviousAction.Add;
@@ -240,79 +129,24 @@ public class JsonParserAttribute : CustomParserAttribute
                         itemToAdd += $"{arg} ";
                     }
 
-                    string? arg2 = null;
-                    var split = itemToAdd.Split('=');
-                    if (isDict && split.Length > 1)
-                    {
-                        itemToAdd = split[0];
-                        arg2 = split[1];
-                    }
-                    else if (isDict && split.Length <= 1)
-                    {
-                        info.ErrorString +=
-                            "<Warn>You entered an object, without it's value. \n" +
-                            "<Warn>Dictionaries require an object and value separated by an <White>'='<Warn>.\n" +
-                            "<Warn>Ex: <White>'C4=0.5' <Warn> or <White> 'Trap=1.5'<Warn>.\n";
-                        failedTries++;
-                        continue;
-                    }
                     
-                    object? arg1Value = ProcessArg(itemToAdd, type.GenericTypeArguments[0]);
-                    object? arg2Value = null;
-                    if (arg2 is not null)
-                    {
-                        arg2Value = ProcessArg(arg2, type.GenericTypeArguments[1]);
-                        if (arg2Value is null)
-                        {
-                            showInvalidWarning = true;
-                            char starter = type.GenericTypeArguments[1].Name[0];
-                            info.ErrorString += $"<Warn>Could not parse value <White>'{arg2}'<Warn>. Ensure it is a{(starter is 'a' or 'e' or 'i' or 'o' or 'u' ? "n" : "" )} {type.GenericTypeArguments[1]}.\n";
-                            failedTries++;
-                            continue;
-                        }
-                    }
-                    if (arg1Value is null || (isDict && arg2Value is null))
+                    object? arg1Value = ProcessArg(itemToAdd, type);
+                    
+                    if (arg1Value is null)
                     {
                         showInvalidWarning = true;
-                        char starter = type.GenericTypeArguments[0].Name[0];
-                        info.ErrorString += $"<Warn>Could not parse key <White>'{itemToAdd}'<Warn>. Ensure it is a{(starter is 'a' or 'e' or 'i' or 'o' or 'u' ? "n" : "" )} {type.GenericTypeArguments[0]}.\n";
+                        char starter = type.Name[0];
+                        info.ErrorString += $"<Warn>Could not parse value <White>'{itemToAdd}'<Warn>. Ensure it is a{(starter is 'a' or 'e' or 'i' or 'o' or 'u' ? "n" : "" )} {type.Name}.\n";
                         failedTries++;
                         continue;
                     }
 
-
-                    if (isDict)
-                    {
-                        if (((IDictionary)obj).Contains(arg1Value))
-                        {
-                            ((IDictionary)obj)[arg1Value] = arg2Value;
-                        }
-                        else
-                        {
-                            ((IDictionary)obj).Add(arg1Value, arg2Value);
-                        }
-                    }
-                    else
-                    {
-                        if (!((IList)obj).Contains(arg1Value))
-                        {
-                            ((IList)obj).Add(arg1Value);
-                        }
-                    }
-
-                    showInvalidWarning = false;
-                    break;
+                    return arg1Value;
             }
 
         }
-
-        if (previousAction == PreviousAction.Skip)
-        {
-            skip = true;
-            return null;
-        }
-        
-        return obj;
+        skip = true;
+        return null;
     }
 
     enum PreviousAction
@@ -325,7 +159,7 @@ public class JsonParserAttribute : CustomParserAttribute
         Finish
     }
 
-    public object? ProcessArg(string arg, Type type)
+    public virtual object? ProcessArg(string arg, Type type)
     {
         try
         {

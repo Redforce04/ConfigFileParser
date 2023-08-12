@@ -24,10 +24,9 @@ namespace ConfigFileParser;
 
 public class VersionInfo
 {
-    public const string CommitHash = "e6a8e098";
+    public const string CommitHash = "4e289f18";
     public const string CommitBranch = "master";
-    public const string CommitVersion = "v1.0.2-beta";
-    public static bool Portable => _portable == "true";
-    private const string _portable = "{PORTABLE}";
-    public static DateTime BuildTime = DateTime.Parse("2023-08-11T03:26:15");
+    public const string CommitVersion = "v1.0.3-beta";    
+    public const string Architecture = "{BUILD_ARCH}";
+    public static DateTime BuildTime = DateTime.Parse("2023-08-11T03:28:20");
 }

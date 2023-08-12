@@ -6,104 +6,64 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using ConfigFileParser;
 using ConfigFileParser.Components;
 using ConfigFileParser.Configs;
+using Newtonsoft.Json.Converters;
 
 //CosturaUtility.Initialize();
-
+var unusedStringEnumConverter = new StringEnumConverter();
 Config conf = new Config();
 conf.Args = args;
 Config.Singleton.Debug = args.Any(x => x == "--debug");
+Config.Singleton.InteractiveStartup = args.Any(x => x == "--interactive-startup");
 if (args.Any(x => x == "--attach-debugger"))
 {
+    Config.Singleton.AttachDebugger = true;
     Console.WriteLine("Launching Debugger");
     Debugger.Launch();
-}
-
-try
-{
-    if (args.Any(x => x == "--updateNew"))
-    {
-        Console.WriteLine($"Restarting after rename");
-        string srcFile = "";
-        string destFile = "";
-        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
-        {
-            var split = file.Replace("\\", "/");
-            string fileName = split.Split('/')[^1];
-            string fileEnd = fileName.Contains(".") ? "." + fileName.Split('.')[^1] : "";
-            if (file.Contains("BetterConfigs") && file.Contains("-new") && !file.EndsWith(".dll") &&
-                !file.EndsWith(".pdb") && !file.EndsWith(".deps.json") && !file.EndsWith(".runtimeconfig.json"))
-            {
-                srcFile = file;
-                destFile = split.Replace($"/{fileName}", "") + "/MGHBetterConfigs" + fileEnd;
-                break;
-            }
-        }
-
-        if (conf.Debug)
-        {
-            Console.WriteLine($"Found Source File: {srcFile}, replacing dest file: {destFile}");
-        }
-
-        File.Delete(destFile);
-        File.Copy(srcFile, destFile, true);
-
-        List<string> curArgs = args.ToList();
-        curArgs.Remove($"--updateNew");
-        curArgs.Add("--updateRestart");
-        Process.Start(destFile, curArgs);
-        Environment.Exit(0);
-        return;
-    }
-
-
-}
-catch (Exception e)
-{
-    if (Config.Singleton.Debug)
-    {
-        Console.WriteLine(e);
-    }
-
-    return;
-}
-
-try
-{
-    if (args.Any(x => x == "--updateRestart"))
-    {
-        CustomTextParser.Singleton.PrintLine("Update installed successfully.");
-        conf.AutoUpdate = false;
-        foreach (string file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
-        {
-            string fileName = file.Replace("\\", "/").Split('/')[^1];
-            if (fileName.Contains("-new") && fileName.Contains("BetterConfigs"))
-            {
-                File.Delete(file);
-                break;
-            }
-        }
-    }
-}
-catch (Exception e)
-{
-    if (conf.Debug)
-    {
-        Console.WriteLine($"Caught exception: {e}");
-    }    
 }
 
 var unused4 = new CustomTextParser();
 
 CustomTextParser.Singleton.PrintLine("Starting MGH BetterConfigs.");
-Thread.Sleep(2000);
-var unused = new ArgumentParser(args);
+
+// string? i = CustomTextParser.Singleton.PrintCoundown("Starting MGH BetterConfigs", 2);
+List<string> argsList = args.ToList();
+if (Config.Singleton.InteractiveStartup)
+{
+    CustomTextParser.Singleton.Print("Interactive argument mode is active. Please input additional arguments, or type <White>'skip'<Primary> to skip this step.");
+    string? inpt = Console.ReadLine();
+    if (inpt is not null && inpt != "")
+    {
+        if (inpt.ToLower() == "skip")
+        {
+            CustomTextParser.Singleton.Print("Skipping custom arguments.");
+            goto SkipArgs;
+        }
+        Regex reg = new Regex("\"(.*?)\"|([\\S]*)");
+
+        foreach (Match match in reg.Matches(inpt))
+        {
+            string val = match.Groups.Count == 0 ? match.Value : match.Groups[^1].Value;
+            if (val == "")
+            {
+                continue;
+            }
+
+            argsList.Add(val);
+        }
+    }
+}
+SkipArgs:
+// CustomTextParser.Singleton.Print("Input arguments added.");
+SleepManager.Sleep(2000);
+var unused = new ArgumentParser(argsList.ToArray());
 if (!ArgumentParser.Singleton.ParsedSuccessfully)
 {
-    Console.WriteLine("Failed to parse arguments successfully.");
+    CustomTextParser.Singleton.PrintLine("<Warn>Failed to parse arguments successfully.");
     Console.Read();
     return;
 }

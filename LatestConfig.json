@@ -10,13 +10,13 @@
       "Type": "Dictionary[DamageMethod, Single]"
     },
     {
-      "Name": "Banned Thingamabobs",
-      "ConfigName": "BannedThingamabobs",
-      "InternalFieldName": "BannedThingamabobs",
-      "Description": "What thingamabobs should be banned from being used.",
+      "Name": "Banned Hunter Weapon / Gadgets",
+      "ConfigName": "BannedHunterWeaponGadgets",
+      "InternalFieldName": "BannedHunterWeaponGadgets",
+      "Description": "What hunter weapons / gadgets should be banned from being used.",
       "DefaultValue": "Empty",
       "Value": [],
-      "Type": "List[Thingamabobs]"
+      "Type": "List[HunterGadget]"
     },
     {
       "Name": "Banned Hunter Perks",
